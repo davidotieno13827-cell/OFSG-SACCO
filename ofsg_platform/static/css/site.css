@@ -1,0 +1,159 @@
+/* Site helper styles and brand variables */
+:root {
+    --ofsg-maroon: #7b1f1f;
+    --ofsg-green: #16a34a;
+    --ofsg-dark: #07294D;
+    --ofsg-muted: #6B7280;
+    --ofsg-gold: #F2C94C;
+    --card-shadow: 0 8px 18px rgba(7, 41, 77, 0.08);
+}
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-toggle {
+    position: absolute;
+    right: .75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #475569;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: .15rem;
+}
+
+.nav-dark {
+    background: var(--ofsg-dark);
+    color: #fff;
+}
+
+.brand-hero {
+    background: linear-gradient(90deg, var(--ofsg-maroon), var(--ofsg-green));
+    color: #fff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 18px 40px rgba(2, 6, 23, 0.08);
+}
+
+.brand-btn {
+    background: var(--ofsg-green);
+    color: #fff;
+    padding: .6rem .9rem;
+    border-radius: .5rem;
+    box-shadow: 0 6px 18px rgba(16, 163, 82, 0.12);
+    transition: transform .08s ease, box-shadow .12s ease;
+}
+
+.brand-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(16, 163, 82, 0.14);
+}
+
+.brand-btn-secondary {
+    background: var(--ofsg-maroon);
+    color: #fff;
+    padding: .6rem .9rem;
+    border-radius: .5rem;
+    box-shadow: 0 6px 14px rgba(139, 30, 63, 0.08);
+}
+
+.brand-btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(139, 30, 63, 0.12);
+}
+
+.btn-green {
+    background: var(--ofsg-green);
+    color: #fff;
+    padding: .5rem .9rem;
+    border-radius: .5rem;
+}
+
+.btn-maroon {
+    background: var(--ofsg-maroon);
+    color: #fff;
+    padding: .5rem .9rem;
+    border-radius: .5rem;
+}
+
+.btn-navy {
+    background: var(--ofsg-dark);
+    color: #fff;
+    padding: .5rem .9rem;
+    border-radius: .5rem;
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 1rem;
+    box-shadow: var(--card-shadow);
+    padding: 1rem;
+}
+
+.accent-left-green {
+    border-left: 6px solid var(--ofsg-green);
+}
+
+.accent-left-maroon {
+    border-left: 6px solid var(--ofsg-maroon);
+}
+
+.accent-left-navy {
+    border-left: 6px solid var(--ofsg-dark);
+}
+
+.text-accent-green {
+    color: var(--ofsg-green);
+}
+
+.text-accent-maroon {
+    color: var(--ofsg-maroon);
+}
+
+.text-accent-navy {
+    color: var(--ofsg-dark);
+}
+
+/* File input styling for consistent upload UI */
+input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: .5rem .6rem;
+    border-radius: .5rem;
+    border: 1px dashed rgba(15, 23, 42, 0.08);
+    background: rgba(250, 250, 250, 0.9);
+    color: var(--ofsg-muted);
+}
+
+.file-label {
+    display: block;
+    font-size: .9rem;
+    color: var(--ofsg-muted);
+    margin-top: .35rem;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: .75rem;
+}
+
+.card .card-title {
+    font-weight: 700;
+    color: var(--ofsg-dark);
+}
+
+.upload-note {
+    font-size: .85rem;
+    color: var(--ofsg-muted);
+    margin-top: .35rem;
+}
+
+/* Small accessibility helpers left intentionally minimal. */

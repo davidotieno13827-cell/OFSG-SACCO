@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4 border-b border-slate-200 pb-4">
+    <div>
+        <h1 class="text-3xl font-bold" style="color:var(--ofsg-dark)">Welcome back, {{ user.username }}</h1>
+        <p class="text-sm" style="color:var(--ofsg-muted)">Member since: {{ user.registration_date|date:"F Y" }}</p>
+    </div>
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="brand-btn">Logout</button>
+    </form>
+</div>
+
+{% if is_treasurer %}
+<div class="mb-6 flex flex-wrap gap-3">
+    <a href="{% url 'add_contribution' %}" class="brand-btn">+ Add New Contribution</a>
+    <a href="{% url 'add_fine' %}" class="brand-btn-secondary">+ Add Fine</a>
+    <a href="{% url 'profile' %}" class="btn-navy">Edit Profile</a>
+    {% if can_view_member_directory %}
+    <a href="{% url 'members_list' %}" class="btn-navy">View Members</a>
+    <a href="{% url 'management_summary' %}" class="btn-navy">Management Summary</a>
+    {% endif %}
+    {% if is_overseer or user.is_superuser %}
+    <a href="/admin/members/fine/" class="btn-navy">View Audit Trail</a>
+    {% endif %}
+</div>
+{% elif is_overseer %}
+<div class="mb-6 flex flex-wrap gap-3">
+    <a href="{% url 'profile' %}" class="btn-navy">Edit Profile</a>
+    <a href="{% url 'members_list' %}" class="btn-navy">View Members</a>
+    <a href="{% url 'management_summary' %}" class="btn-navy">Management Summary</a>
+    <a href="/admin/members/fine/" class="btn-maroon">View Audit Trail</a>
+</div>
+{% else %}
+<div class="mb-6 flex flex-wrap gap-3">
+    <a href="{% url 'profile' %}" class="btn-navy">Edit Profile</a>
+</div>
+{% endif %}
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="card p-6 accent-left-green">
+        <h3 class="text-slate-500 font-semibold mb-1">Total Savings Equity</h3>
+        <p class="text-4xl font-bold text-accent-green">Ksh {{ total_savings }}</p>
+        <p class="text-sm text-slate-500 mt-2">Across {{ contribution_count }} recorded contribution entries.</p>
+    </div>
+
+    <div class="card p-6 accent-left-maroon">
+        <h3 class="text-slate-500 font-semibold mb-1">Outstanding Fines</h3>
+        <p class="text-4xl font-bold text-accent-maroon">Ksh {{ total_fines }}</p>
+        {% if total_fines > 0 %}
+            <p class="text-sm text-accent-maroon mt-2">You have {{ outstanding_fine_count }} unpaid fine{{ outstanding_fine_count|pluralize }} to clear.</p>
+        {% else %}
+            <p class="text-sm text-accent-green mt-2">No outstanding fines at the moment.</p>
+        {% endif %}
+    </div>
+
+    <div class="card p-6 accent-left-navy">
+        <h3 class="text-slate-500 font-semibold mb-1">Member Status</h3>
+        <p class="text-2xl font-bold text-accent-navy">Active</p>
+        <p class="text-sm text-slate-500 mt-2">Your profile and payment records are available for review in this portal.</p>
+    </div>
+</div>
+
+<div class="mb-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+    <div>
+        <h3 class="font-semibold text-slate-900">Quick actions</h3>
+        <p class="text-sm text-slate-600">Jump straight to the most common SACCO tasks from your dashboard.</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+        <a href="{% url 'profile' %}" class="btn-navy">Update Profile</a>
+        {% if is_treasurer %}
+            <a href="{% url 'add_contribution' %}" class="btn-green">Add Contribution</a>
+            <a href="{% url 'add_fine' %}" class="btn-maroon">Add Fine</a>
+        {% endif %}
+    </div>
+</div>
+
+{% if can_view_member_directory %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="card p-6 accent-left-navy">
+        <p class="text-sm text-slate-500">Total Members</p>
+        <p class="text-3xl font-semibold text-slate-900">{{ total_members }}</p>
+        <p class="text-sm text-slate-500 mt-2">Members currently registered in the system.</p>
+    </div>
+    <div class="card p-6 accent-left-green">
+        <p class="text-sm text-slate-500">Active Members</p>
+        <p class="text-3xl font-semibold text-accent-green">{{ active_members }}</p>
+        <p class="text-sm text-slate-500 mt-2">Members with active SACCO status.</p>
+    </div>
+    <div class="card p-6 accent-left-maroon">
+        <p class="text-sm text-slate-500">Inactive Members</p>
+        <p class="text-3xl font-semibold text-accent-maroon">{{ inactive_members }}</p>
+        <p class="text-sm text-slate-500 mt-2">Members currently listed as inactive.</p>
+    </div>
+</div>
+
+<div class="card p-6 mb-8">
+    <div class="brand-hero px-6 py-3">
+        <h3 class="font-semibold">Leader Control Center</h3>
+    </div>
+    <div class="p-6 grid gap-4 md:grid-cols-3">
+        <a href="{% url 'members_list' %}" class="block border border-slate-200 rounded-2xl p-5 hover:shadow-lg transition">
+            <p class="text-sm text-slate-500">Member management</p>
+            <p class="mt-3 font-semibold text-slate-900">View members</p>
+        </a>
+        <a href="{% url 'management_summary' %}" class="block border border-slate-200 rounded-2xl p-5 hover:shadow-lg transition">
+            <p class="text-sm text-slate-500">Payments & fines overview</p>
+            <p class="mt-3 font-semibold text-slate-900">Management summary</p>
+        </a>
+        <a href="{% url 'add_contribution' %}" class="block border border-slate-200 rounded-2xl p-5 hover:shadow-lg transition">
+            <p class="text-sm text-slate-500">Record savings</p>
+            <p class="mt-3 font-semibold text-slate-900">Add contribution</p>
+        </a>
+        <a href="{% url 'add_fine' %}" class="block border border-slate-200 rounded-2xl p-5 hover:shadow-lg transition">
+            <p class="text-sm text-slate-500">Penalty management</p>
+            <p class="mt-3 font-semibold text-slate-900">Issue fine</p>
+        </a>
+        {% if is_overseer or user.is_superuser %}
+        <a href="/admin/members/fine/" class="block border border-slate-200 rounded-2xl p-5 hover:shadow-lg transition">
+            <p class="text-sm text-slate-500">Audit and compliance</p>
+            <p class="mt-3 font-semibold text-slate-900">Audit trail</p>
+        </a>
+        {% endif %}
+        <a href="/admin/" class="block border border-slate-200 rounded-2xl p-5 hover:shadow-lg transition">
+            <p class="text-sm text-slate-500">System admin</p>
+            <p class="mt-3 font-semibold text-slate-900">Open Django admin</p>
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<div class="grid lg:grid-cols-2 gap-6">
+    <div class="card overflow-hidden">
+        <div class="brand-hero px-6 py-3">
+            <h3 class="font-semibold">Recent Contributions</h3>
+        </div>
+        <div class="p-6">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="text-slate-500 border-b">
+                        <th class="pb-3">Date</th>
+                        <th class="pb-3">Type</th>
+                        <th class="pb-3 text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in contributions %}
+                    <tr class="border-b last:border-b-0">
+                        <td class="py-3">{{ item.date_paid|date:"M d, Y" }}</td>
+                        <td class="py-3">{{ item.contribution_type }}</td>
+                        <td class="py-3 text-right font-semibold">Ksh {{ item.amount }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="py-4 text-center text-slate-500">No contributions found yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card overflow-hidden">
+        <div class="brand-hero px-6 py-3">
+            <h3 class="font-semibold">Outstanding Fine Summary</h3>
+        </div>
+        <div class="p-6">
+            {% if fines %}
+                <ul class="space-y-3">
+                    {% for fine in fines %}
+                    <li class="border-b last:border-b-0 pb-3 last:pb-0">
+                        <div class="flex justify-between items-center">
+                            <span class="font-semibold text-slate-800">{{ fine.fine_type }}</span>
+                            <span class="text-accent-maroon font-semibold">Ksh {{ fine.amount }}</span>
+                        </div>
+                        <p class="text-sm text-slate-500 mt-1">Issued: {{ fine.date_issued|date:"M d, Y" }}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-slate-500">No outstanding fines are currently recorded.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

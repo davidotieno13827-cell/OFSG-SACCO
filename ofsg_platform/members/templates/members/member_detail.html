@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+    <div>
+        <h1 class="text-3xl font-bold text-slate-900">{{ member.username }}</h1>
+        <p class="text-slate-600">Phone: {{ member.phone_number|default:"—" }}</p>
+    </div>
+    <a href="{% url 'members_list' %}" class="brand-btn">Back to Directory</a>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-6">
+    <div class="card p-6">
+        <h2 class="text-xl font-semibold text-slate-900">Member Profile</h2>
+            <div class="grid gap-4 md:grid-cols-2 mt-4">
+                {% if member.profile_picture %}
+                    <div class="text-center">
+                        <p class="font-medium text-slate-700 mb-2">Profile Picture</p>
+                        <img src="{% url 'member_file' member.id 'profile_picture' %}" alt="{{ member.username }} profile picture" class="mx-auto rounded-xl w-40 h-40 object-cover" />
+                    </div>
+                {% endif %}
+                <div>
+                    <dl class="space-y-3 text-sm text-slate-600">
+                        <div class="flex justify-between"><dt class="font-medium text-slate-700">Status</dt><dd>{% if member.is_active_member %}<span class="text-accent-green font-semibold">Active</span>{% else %}<span class="text-accent-maroon font-semibold">Inactive</span>{% endif %}</dd></div>
+                        <div class="flex justify-between"><dt class="font-medium text-slate-700">Registration</dt><dd>{{ member.registration_date|date:"M d, Y" }}</dd></div>
+                        <div class="flex justify-between"><dt class="font-medium text-slate-700">Next of Kin</dt><dd>{{ member.next_of_kin_name|default:"—" }}</dd></div>
+                        <div class="flex justify-between"><dt class="font-medium text-slate-700">Guardian 1</dt><dd>{{ member.guardian_1|default:"—" }}</dd></div>
+                        <div class="flex justify-between"><dt class="font-medium text-slate-700">Guardian 2</dt><dd>{{ member.guardian_2|default:"—" }}</dd></div>
+                    </dl>
+                </div>
+            </div>
+            <div class="mt-6 space-y-3 text-sm text-slate-600">
+                {% if member.passport_photo %}
+                    <div>
+                        <p class="font-medium text-slate-700">Passport Photo</p>
+                        <a href="{% url 'member_file' member.id 'passport_photo' %}" class="text-accent-navy hover:underline">Download or view passport photo</a>
+                    </div>
+                {% endif %}
+                {% if member.id_document %}
+                    <div>
+                        <p class="font-medium text-slate-700">ID Document</p>
+                        <a href="{% url 'member_file' member.id 'id_document' %}" class="text-accent-navy hover:underline">Download ID document</a>
+                    </div>
+                {% endif %}
+            </div>
+    <div class="card p-6">
+        <h2 class="text-xl font-semibold text-slate-900">Recent Contributions</h2>
+        <ul class="mt-4 space-y-3">
+            {% for contribution in contributions %}
+                <li class="border-b last:border-b-0 pb-3 last:pb-0">
+                    <div class="flex justify-between text-sm">
+                        <span class="font-medium text-slate-700">{{ contribution.contribution_type }}</span>
+                        <span class="text-accent-green font-semibold">Ksh {{ contribution.amount }}</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">{{ contribution.date_paid|date:"M d, Y" }}</p>
+                </li>
+            {% empty %}
+                <li class="text-sm text-slate-500">No contributions recorded.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="mt-6 card p-6">
+    <h2 class="text-xl font-semibold text-slate-900">Outstanding Fines</h2>
+    <ul class="mt-4 space-y-3">
+        {% for fine in fines %}
+            <li class="border-b last:border-b-0 pb-3 last:pb-0 flex justify-between items-center">
+                <div>
+                    <p class="font-medium text-slate-700">{{ fine.fine_type }}</p>
+                    <p class="text-xs text-slate-500">Issued {{ fine.date_issued|date:"M d, Y" }}</p>
+                </div>
+                <span class="text-accent-maroon font-semibold">Ksh {{ fine.amount }}</span>
+            </li>
+        {% empty %}
+            <li class="text-sm text-slate-500">No fines recorded.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

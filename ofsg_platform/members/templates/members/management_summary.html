@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+    <div>
+        <h1 class="text-3xl font-bold text-slate-900">Management Summary</h1>
+        <p class="text-slate-600">A quick overview of members, payments, and open fines.</p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="brand-btn">Back to Dashboard</a>
+</div>
+
+<div class="mb-6 flex flex-wrap gap-3">
+    <a href="{% url 'add_contribution' %}" class="brand-btn">Record Contribution</a>
+    <a href="{% url 'add_fine' %}" class="brand-btn-secondary">Record Fine</a>
+    <a href="{% url 'members_list' %}" class="brand-btn">Open Directory</a>
+</div>
+
+<div class="grid md:grid-cols-3 gap-6 mb-8">
+    <div class="card p-6 accent-left-navy">
+        <p class="text-sm text-slate-500">Total Members</p>
+        <p class="text-3xl font-semibold text-slate-900">{{ total_members }}</p>
+    </div>
+    <div class="card p-6 accent-left-green">
+        <p class="text-sm text-slate-500">Active Members</p>
+        <p class="text-3xl font-semibold text-accent-green">{{ active_members }}</p>
+    </div>
+    <div class="card p-6 accent-left-maroon">
+        <p class="text-sm text-slate-500">Inactive Members</p>
+        <p class="text-3xl font-semibold text-accent-maroon">{{ inactive_members }}</p>
+    </div>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-6 mb-8">
+    <div class="card p-6">
+        <h3 class="font-semibold text-slate-900">Contribution Mix</h3>
+        <div class="mt-4 space-y-3">
+            {% for item in contribution_breakdown %}
+                <div>
+                    <div class="flex justify-between text-sm text-slate-600 mb-1">
+                        <span>{{ item.label }}</span>
+                        <span>Ksh {{ item.total_amount }}</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2">
+                        <div class="bg-[color:var(--ofsg-dark)] h-2 rounded-full" style="width: {{ item.percent }}%"></div>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-sm text-slate-500">No contribution data yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card p-6">
+        <h3 class="font-semibold text-slate-900">Fine Status</h3>
+        <div class="mt-4 space-y-3">
+            {% for item in fine_status_breakdown %}
+                <div>
+                    <div class="flex justify-between text-sm text-slate-600 mb-1">
+                        <span>{{ item.label }}</span>
+                        <span>{{ item.count }}</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2">
+                        <div class="{% if item.label == 'Open' %}bg-red-500{% else %}bg-green-500{% endif %} h-2 rounded-full" style="width: {% if total_members %}{{ item.count|divisibleby:total_members }}{% endif %}100%"></div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-6">
+    <div class="card overflow-hidden">
+        <div class="brand-hero px-6 py-3">
+            <h3 class="font-semibold">Latest Contributions</h3>
+        </div>
+        <div class="p-6">
+            <ul class="space-y-3">
+                {% for item in recent_contributions %}
+                    <li class="border-b last:border-b-0 pb-3 last:pb-0 flex justify-between items-center">
+                        <div>
+                            <p class="font-medium text-slate-700">{{ item.member.username }}</p>
+                            <p class="text-xs text-slate-500">{{ item.contribution_type }} • {{ item.date_paid|date:"M d, Y" }}</p>
+                        </div>
+                            <span class="font-semibold text-accent-green">Ksh {{ item.amount }}</span>
+                    </li>
+                {% empty %}
+                    <li class="text-sm text-slate-500">No recent contributions.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="card overflow-hidden">
+        <div class="brand-hero px-6 py-3">
+            <h3 class="font-semibold">Open Fines</h3>
+        </div>
+        <div class="p-6">
+            <ul class="space-y-3">
+                {% for fine in open_fines %}
+                    <li class="border-b last:border-b-0 pb-3 last:pb-0 flex justify-between items-center gap-3">
+                        <div>
+                            <p class="font-medium text-slate-700">{{ fine.member.username }}</p>
+                            <p class="text-xs text-slate-500">{{ fine.fine_type }} • {{ fine.date_issued|date:"M d, Y" }}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-semibold text-accent-maroon">Ksh {{ fine.amount }}</span>
+                            {% if can_manage_fines %}
+                                <form method="post" action="{% url 'mark_fine_paid' fine.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-sm brand-btn px-2 py-1 rounded">Mark Paid</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% empty %}
+                    <li class="text-sm text-slate-500">No open fines.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="mt-8 card p-6">
+    <h3 class="font-semibold text-slate-900">Recently Paid Fines</h3>
+    <ul class="mt-4 space-y-3">
+        {% for fine in paid_fines %}
+            <li class="border-b last:border-b-0 pb-3 last:pb-0 flex justify-between items-center">
+                <div>
+                    <p class="font-medium text-slate-700">{{ fine.member.username }}</p>
+                    <p class="text-xs text-slate-500">{{ fine.fine_type }} • {{ fine.date_issued|date:"M d, Y" }}</p>
+                </div>
+                <span class="font-semibold text-accent-green">Paid</span>
+            </li>
+        {% empty %}
+            <li class="text-sm text-slate-500">No payments recorded yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

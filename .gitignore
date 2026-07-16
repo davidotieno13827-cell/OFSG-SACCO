@@ -1,0 +1,12 @@
+.env
+*.pyc
+__pycache__/
+db.sqlite3
+.vscode/
+.venv/
+.env
+/secure_media/
+/staticfiles/
+node_modules/
+.DS_Store
+.coverage

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OFSG SACCO</title>
+    <link rel="stylesheet" href="ofsg_platform/static/css/tailwind.css" />
+    <link rel="stylesheet" href="ofsg_platform/static/css/site.css" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="#" style="display:flex;align-items:center;gap:.6rem;">
+                <img src="ofsg_platform/static/images/logo.svg" alt="OFSG" style="height:40px;" />
+                <span>OFSG SACCO</span>
+            </a>
+            <nav class="site-nav">
+                <a href="#about">About</a>
+                <a href="#services">Save</a>
+                <a href="#borrow">Borrow</a>
+                <a href="#constitution">Constitution</a>
+                <a href="#contact">Contact</a>
+            </nav>
+            <a class="btn btn-primary nav-login" href="/accounts/login/">Login</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="card p-8 brand-hero hero-copy">
+                    <span class="eyebrow">Member-owned savings cooperative</span>
+                    <h1>Access your OFSG savings, loans, governance, and constitution in one place.</h1>
+                    <p>Log in to manage your account, make contributions, and use the constitution search to find rules
+                        and
+                        member guidance instantly.</p>
+                    <div class="hero-actions mt-4">
+                        <a class="brand-btn" href="/accounts/login/">Member Login</a>
+                        <a class="brand-btn" href="/members/register/">Create account</a>
+                        <a class="btn-green" href="/members/profile/">Upload documents</a>
+                        <a class="btn-navy" href="/admin/">Leader / Admin</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-light">
+            <div class="container section-grid">
+                <div>
+                    <h2>From the constitution</h2>
+                    <p>The constitution sets out how membership works, the monthly contribution rules, the executive
+                        governance structure, and the duty of finance transparency.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Key member rules</h3>
+                    <ul class="rule-list">
+                        <li>Monthly contribution: Ksh 1,000 due 20th–27th</li>
+                        <li>Late fee: 20% for payments made 28th–30th</li>
+                        <li>Membership limited to 115 members</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="section-light">
+            <div class="container section-grid">
+                <div>
+                    <h2>About OFSG SACCO</h2>
+                    <p>OFSG SACCO is a member-owned savings and credit cooperative society. We support members with
+                        savings plans, loans, and financial education.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Simple member access</h3>
+                    <p>Use the login button above to sign in and manage your account from any device.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="services">
+            <div class="container">
+                <h2>Our Services</h2>
+                <div class="service-grid">
+                    <div class="service-card">
+                        <h3>Member savings</h3>
+                        <p>Save safely and access your savings history with secure member login.</p>
+                    </div>
+                    <div class="service-card">
+                        <h3>Loans</h3>
+                        <p>Apply for personal or group loans and track repayment details online.</p>
+                    </div>
+                    <div class="service-card">
+                        <h3>Financial training</h3>
+                        <p>Grow your financial knowledge through tailored literacy programs.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="borrow" class="section-light">
+            <div class="container">
+                <h2>Why choose OFSG SACCO?</h2>
+                <ul class="benefits-list">
+                    <li>Member-first service and low-cost loans</li>
+                    <li>Transparent contributions and dividend sharing</li>
+                    <li>Easy online access for members and leaders</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="constitution" class="section-light">
+            <div class="container">
+                <div class="constitution-intro">
+                    <div>
+                        <h2>Search the SACCO Constitution</h2>
+                        <p>Use this search tool to find the exact constitution clause you need, from membership rules to
+                            contribution penalties and governance duties.</p>
+                        <div class="constitution-actions">
+                            <a class="brand-btn" href="constitution-document.html">Open full constitution document</a>
+                        </div>
+                    </div>
+                    <div class="constitution-search">
+                        <label for="constitutionSearch">Search the constitution</label>
+                        <input id="constitutionSearch" type="search"
+                            placeholder="Search for 'contributions', 'membership', 'audit', 'executive', etc." />
+                    </div>
+                </div>
+                <div id="constitutionResults" class="constitution-results"></div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <div class="container contact-card">
+                <h2>Contact Us</h2>
+                <p>Reach out to learn how to join, save, or apply for a loan.</p>
+                <p>Email: <a href="mailto:info@ofsgsacco.com">info@ofsgsacco.com</a></p>
+                <p>Phone: <a href="tel:+254700000000">+254 700 000 000</a></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-inner">
+            <p>&copy; 2026 OFSG SACCO</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
