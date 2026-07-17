@@ -94,12 +94,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Database configuration: use DATABASE_URL (Postgres) in production, otherwise fall back to SQLite for local dev.
+DATABASE_URL = os.getenv('DATABASE_URL', '')
+if DATABASE_URL:
+    try:
+        import dj_database_url
+
+        DATABASES = {
+            'default': dj_database_url.parse(DATABASE_URL, conn_max_age=int(os.getenv('DB_CONN_MAX_AGE', 600)))
+        }
+    except Exception:
+        # If dj_database_url isn't available for some reason, fallback to sqlite to avoid crashes during tests.
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
