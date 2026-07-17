@@ -1,5 +1,6 @@
 import base64
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
@@ -62,6 +63,15 @@ class RegistrationViewTests(TestCase):
         self.assertTrue(member.profile_picture)
         self.assertTrue(member.passport_photo)
         self.assertTrue(member.id_document)
+
+class DemoUserSeedTests(TestCase):
+    def test_seed_demo_users_creates_demo_accounts(self):
+        call_command('seed_demo_users')
+
+        self.assertTrue(Member.objects.filter(username='admin').exists())
+        self.assertTrue(Member.objects.filter(username='demo_member').exists())
+        self.assertTrue(Member.objects.filter(username='demo_treasurer').exists())
+
 
 class AuthenticationFlowTests(TestCase):
     def test_login_redirects_authenticated_user_to_dashboard(self):
