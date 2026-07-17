@@ -100,9 +100,16 @@ if DATABASE_URL:
     try:
         import dj_database_url
 
-        DATABASES = {
-            'default': dj_database_url.parse(DATABASE_URL, conn_max_age=int(os.getenv('DB_CONN_MAX_AGE', 600)))
-        }
+        parsed = dj_database_url.parse(DATABASE_URL, conn_max_age=int(os.getenv('DB_CONN_MAX_AGE', 600)))
+        # Optional: allow pinning a Postgres schema for this deployment so one DB can host multiple sites
+        DB_SCHEMA = os.getenv('DB_SCHEMA', '').strip()
+        if DB_SCHEMA:
+            opts = parsed.get('OPTIONS', {}) or {}
+            # set Postgres search_path so Django creates/talks to tables in the specified schema
+            opts.update({'options': f"-c search_path={DB_SCHEMA}"})
+            parsed['OPTIONS'] = opts
+
+        DATABASES = {'default': parsed}
     except Exception:
         # If dj_database_url isn't available for some reason, fallback to sqlite to avoid crashes during tests.
         DATABASES = {
