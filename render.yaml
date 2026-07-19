@@ -3,10 +3,10 @@ services:
     name: ofsg-platform
     env: python
     plan: free
-    buildCommand: "pip install -r requirements.txt && cd ofsg_platform && python manage.py collectstatic --noinput"
-    startCommand: "cd ofsg_platform && python manage.py migrate --noinput && python manage.py seed_demo_users && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+    startCommand: "python manage.py migrate --noinput && python manage.py seed_demo_users && gunicorn ofsg_platform.config.wsgi:application --bind 0.0.0.0:$PORT"
     # Run migrations and seed demo data at start so the web runtime has the app database ready.
-    releaseCommand: "cd ofsg_platform && python manage.py migrate --noinput && python manage.py seed_demo_users"
+    releaseCommand: "python manage.py migrate --noinput && python manage.py seed_demo_users"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
