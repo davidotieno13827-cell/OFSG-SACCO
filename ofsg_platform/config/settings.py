@@ -171,6 +171,12 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = os.getenv('SECURE_HSTS_PRELOAD', 'True') == 'True'
     SECURE_HSTS_INCLUDE_SUBDOMAINS = os.getenv('SECURE_HSTS_INCLUDE_SUBDOMAINS', 'True') == 'True'
     X_FRAME_OPTIONS = 'DENY'
+    # Allow form submissions from the live Render domain and any custom domain
+    _csrf_origins = ['https://*.onrender.com']
+    _custom_domain = os.getenv('CUSTOM_DOMAIN', '').strip()
+    if _custom_domain:
+        _csrf_origins.append(f'https://{_custom_domain}')
+    CSRF_TRUSTED_ORIGINS = _csrf_origins
 else:
     # Permissive settings while developing locally
     SESSION_COOKIE_SECURE = False
