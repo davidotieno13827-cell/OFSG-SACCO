@@ -1,9 +1,6 @@
-import mimetypes
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count, Q, Sum
-from django.http import FileResponse, Http404
 from .models import Contribution, Fine, Member
 from .forms import ContributionForm, FineForm, MemberRegistrationForm, ProfileUpdateForm
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -32,14 +29,9 @@ def can_view_member_directory(user):
 
 def register_member(request):
     if request.method == 'POST':
-        form = MemberRegistrationForm(request.POST, request.FILES)
+        form = MemberRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            for field_name in ('profile_picture', 'passport_photo', 'id_document'):
-                uploaded_file = request.FILES.get(field_name)
-                if uploaded_file:
-                    setattr(user, field_name, uploaded_file)
-            user.save()
             # send activation email
             current_site = get_current_site(request)
             subject = 'Activate your OFSG account'
@@ -204,43 +196,6 @@ def member_detail(request, member_id):
 
 
 @login_required
-def secure_member_file(request, member_id, file_type):
-    member = get_object_or_404(Member, pk=member_id)
-    if not can_view_member_directory(request.user) and request.user != member:
-        return redirect('dashboard')
-
-    file_fields = {
-        'profile_picture': member.profile_picture,
-        'passport_photo': member.passport_photo,
-        'id_document': member.id_document,
-    }
-    if file_type not in file_fields:
-        raise Http404('File type not supported.')
-
-    file_field = file_fields[file_type]
-    if not file_field:
-        raise Http404('Requested file not found.')
-
-    try:
-        file_handle = file_field.open('rb')
-    except FileNotFoundError:
-        raise Http404('File not found on disk.')
-
-    download_name = file_field.name.split('/')[-1]
-    as_attachment = file_type != 'profile_picture'
-    content_type, _ = mimetypes.guess_type(file_field.path if hasattr(file_field, 'path') else file_field.name)
-    if not content_type:
-        content_type = 'application/octet-stream'
-
-    return FileResponse(
-        file_handle,
-        as_attachment=as_attachment,
-        filename=download_name,
-        content_type=content_type,
-    )
-
-
-@login_required
 def management_summary(request):
     if not can_view_member_directory(request.user):
         return redirect('dashboard')
@@ -320,3 +275,9 @@ def mark_fine_paid(request, fine_id):
         fine.is_paid = True
         fine.save(update_fields=['is_paid'])
     return redirect('management_summary')
+
+
+@login_required
+def constitution(request):
+    """Display the full OFSG constitution to authenticated members only."""
+    return render(request, 'members/constitution.html')

@@ -1,57 +1,173 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="grid lg:grid-cols-[1.2fr_0.8fr] gap-8 items-start">
-    <div class="card p-8">
-        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-accent-navy">OFSG SACCO MEMBER PORTAL</p>
-        <h1 class="text-4xl font-bold text-slate-900 mt-3">Stay connected to your savings, fines, and member records.</h1>
-        <p class="mt-4 text-lg text-slate-600">
-            This portal helps members review monthly contributions, manage AGM fees, track welfare obligations, and keep nomination details current.
-        </p>
-        <p class="mt-4 text-sm text-slate-500">
-            Use the dashboard to review payment activity, follow outstanding fines, and access management tools where permitted.
-        </p>
-        <div class="mt-6 flex flex-wrap gap-3">
+
+<!-- ══ HERO ══════════════════════════════════════════════════ -->
+<section class="home-hero rounded-xl mb-6">
+    <div class="home-hero-inner">
+        <!-- Left: text -->
+        <div class="home-hero-text">
+            <span class="home-live-badge">● OFSG SACCO Member Portal</span>
+            <h1 class="home-hero-h1">OSCAR FIVE SELF HELP GROUP</h1>
+            <p class="home-hero-motto">"Unity is strength"</p>
+            <p class="home-hero-sub">Est. 1st November 2022 · Nairobi, Kenya</p>
+            <p class="home-hero-body">
+                Your single hub for monthly contributions, AGM fees, welfare, fines, and member records.
+            </p>
+            <div class="home-hero-btns">
+                {% if user.is_authenticated %}
+                    <a href="/members/dashboard/" class="home-btn-primary">Open My Dashboard</a>
+                {% else %}
+                    <a href="/accounts/login/" class="home-btn-primary">Member Login</a>
+                    <a href="/members/register/" class="home-btn-ghost">Register</a>
+                    <a href="/admin/" class="home-btn-ghost">Admin Login</a>
+                {% endif %}
+            </div>
+        </div>
+        <!-- Right: info tiles -->
+        <div class="home-tiles">            <div class="home-tile">
+                <span class="home-tile-num">2022</span>
+                <span class="home-tile-lbl">Founded</span>
+            </div>
+            <div class="home-tile">
+                <span class="home-tile-num">Active</span>
+                <span class="home-tile-lbl">Members</span>
+            </div>
+            <div class="home-tile">
+                <span class="home-tile-num">Monthly</span>
+                <span class="home-tile-lbl">Savings</span>
+            </div>
+            <div class="home-tile">
+                <span class="home-tile-num">Secure</span>
+                <span class="home-tile-lbl">Portal</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ TWO-COLUMN: ACCESS + SIDEBAR ═════════════════════════ -->
+<div class="home-two-col mb-6">
+
+    <!-- LEFT: Portal access links -->
+    <div class="card p-5">
+        <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Portal Access</h2>
+        <div class="divide-y divide-slate-100">
             {% if user.is_authenticated %}
-                <a href="/members/dashboard/" class="brand-btn">Open Dashboard</a>
+            <a href="/members/dashboard/" class="home-access-row">
+                <span class="home-access-dot" style="background:#16a34a;"></span>
+                <span class="home-access-label">My Dashboard</span>
+                <span class="home-access-desc">View contributions, fines and member activity</span>
+                <span class="home-access-arrow">›</span>
+            </a>
+            <a href="/members/profile/" class="home-access-row">
+                <span class="home-access-dot" style="background:#2563eb;"></span>
+                <span class="home-access-label">My Profile</span>
+                <span class="home-access-desc">Update personal and nomination details</span>
+                <span class="home-access-arrow">›</span>
+            </a>
+            <a href="/members/constitution/" class="home-access-row">
+                <span class="home-access-dot" style="background:#7c3aed;"></span>
+                <span class="home-access-label">Group Constitution</span>
+                <span class="home-access-desc">Read the official OFSG rules and guidelines</span>
+                <span class="home-access-arrow">›</span>
+            </a>
             {% else %}
-                <a href="/accounts/login/" class="brand-btn">Member Login</a>
-                <a href="/admin/" class="btn-navy">Leader / Admin Sign in</a>
-                <a href="/members/register/" class="bg-white border border-slate-300 px-5 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">Register New Member</a>
+            <a href="/accounts/login/" class="home-access-row">
+                <span class="home-access-dot" style="background:#16a34a;"></span>
+                <span class="home-access-label">Member Login</span>
+                <span class="home-access-desc">Access your dashboard, contributions and profile</span>
+                <span class="home-access-arrow">›</span>
+            </a>
+            <a href="/members/register/" class="home-access-row">
+                <span class="home-access-dot" style="background:#2563eb;"></span>
+                <span class="home-access-label">Register New Member</span>
+                <span class="home-access-desc">Create your account to join the portal</span>
+                <span class="home-access-arrow">›</span>
+            </a>
+            <a href="/admin/" class="home-access-row">
+                <span class="home-access-dot" style="background:#07294D;"></span>
+                <span class="home-access-label">Admin / Leader Login</span>
+                <span class="home-access-desc">Treasurer and management tools</span>
+                <span class="home-access-arrow">›</span>
+            </a>
+            <a href="/members/profile/" class="home-access-row">
+                <span class="home-access-dot" style="background:#9333ea;"></span>
+                <span class="home-access-label">Update Nominations</span>
+                <span class="home-access-desc">Edit next-of-kin and guardian details</span>
+                <span class="home-access-arrow">›</span>
+            </a>
             {% endif %}
-            <a href="/members/profile/" class="bg-white border border-slate-300 px-5 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">Update Nomination Details</a>
-        </div>
-        <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
-            <p class="font-semibold">Preview accounts</p>
-            <p class="mt-1">Admin: <span class="font-mono">admin / Admin123!</span></p>
-            <p>Member: <span class="font-mono">demo_member / Demo123!</span></p>
-            <p>Treasurer: <span class="font-mono">demo_treasurer / Demo123!</span></p>
         </div>
     </div>
 
-    <div class="bg-blue-950 text-white rounded-3xl shadow p-8">
-        <h2 class="text-2xl font-semibold">What members can do here</h2>
-        <ul class="mt-4 space-y-3 text-sm text-blue-100">
-            <li>• Review personal contribution history and savings totals</li>
-            <li>• Track outstanding fines and payment status</li>
-            <li>• Keep next-of-kin and guardian details current</li>
-            <li>• Access treasurer and oversight tools where permitted</li>
-        </ul>
+    <!-- RIGHT: Demo credentials + Contact -->
+    <div class="flex flex-col gap-4">
+        {% if not user.is_authenticated %}
+        <div class="card p-4 border-l-4 border-blue-400">
+            <p class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">Preview Accounts</p>
+            <div class="space-y-2">
+                <div class="demo-cred-row">
+                    <span class="demo-badge bg-red-100 text-red-700">Admin</span>
+                    <code class="demo-code">admin</code>
+                    <span class="text-slate-300 text-xs">/</span>
+                    <code class="demo-code">Admin123!</code>
+                </div>
+                <div class="demo-cred-row">
+                    <span class="demo-badge bg-green-100 text-green-700">Member</span>
+                    <code class="demo-code">demo_member</code>
+                    <span class="text-slate-300 text-xs">/</span>
+                    <code class="demo-code">Demo123!</code>
+                </div>
+                <div class="demo-cred-row">
+                    <span class="demo-badge bg-blue-100 text-blue-700">Treasurer</span>
+                    <code class="demo-code">demo_treasurer</code>
+                    <span class="text-slate-300 text-xs">/</span>
+                    <code class="demo-code">Demo123!</code>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <div class="card p-4">
+            <p class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">Contact Us</p>
+            <ul class="space-y-2 text-xs text-slate-600">
+                <li>📞 &nbsp;+254 792 331 717</li>
+                <li>📞 &nbsp;+254 725 677 789 / +254 788 806 068</li>
+                <li>📧 &nbsp;Oscarfiveshg@gmail.com</li>
+                <li>📍 &nbsp;Nairobi CBD, Kenya</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ══ FEATURES GRID ═════════════════════════════════════════ -->
+<section class="mb-6">
+    <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">What Members Can Do</h2>
+    <div class="home-feat-grid">
+        <div class="home-feat-card" style="border-top-color:#3b82f6;">
+            <p class="home-feat-title">Contribution Tracking</p>
+            <p class="home-feat-desc">View monthly savings history, AGM fees, and welfare contributions.</p>
+        </div>
+        <div class="home-feat-card" style="border-top-color:#ef4444;">
+            <p class="home-feat-title">Fine Management</p>
+            <p class="home-feat-desc">Track outstanding fines for late payments or non-attendance.</p>
+        </div>
+        <div class="home-feat-card" style="border-top-color:#16a34a;">
+            <p class="home-feat-title">Profile & Nominations</p>
+            <p class="home-feat-desc">Keep next-of-kin and guardian details current and accurate.</p>
+        </div>
+        <div class="home-feat-card" style="border-top-color:#f59e0b;">
+            <p class="home-feat-title">Group Constitution</p>
+            <p class="home-feat-desc">Access the official OFSG rules directly from your account.</p>
+        </div>
+        <div class="home-feat-card" style="border-top-color:#8b5cf6;">
+            <p class="home-feat-title">Member Directory</p>
+            <p class="home-feat-desc">Admins view a full member list with contribution and compliance status.</p>
+        </div>
+        <div class="home-feat-card" style="border-top-color:#0d9488;">
+            <p class="home-feat-title">Management Reports</p>
+            <p class="home-feat-desc">Treasurer tools: record contributions, issue fines, and run summaries.</p>
+        </div>
     </div>
 </section>
 
-<section class="grid md:grid-cols-3 gap-6 mt-8">
-    <div class="card p-6 border-l-4 border-blue-500">
-        <h3 class="text-lg font-semibold text-slate-900">Membership support</h3>
-        <p class="mt-2 text-sm text-slate-600">Member records, nomination details, and support information stay organized and easy to review.</p>
-    </div>
-    <div class="card p-6 border-l-4 border-green-500">
-        <h3 class="text-lg font-semibold text-slate-900">Payments and compliance</h3>
-        <p class="mt-2 text-sm text-slate-600">Track monthly contributions, AGM fees, welfare obligations, and any fines tied to late payments or non-attendance.</p>
-    </div>
-    <div class="card p-6 border-l-4 border-purple-500">
-        <h3 class="text-lg font-semibold text-slate-900">Profile management</h3>
-        <p class="mt-2 text-sm text-slate-600">Nomination and guardian records are kept in one place to support accurate and timely updates.</p>
-    </div>
-</section>
 {% endblock %}

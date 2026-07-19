@@ -1,0 +1,1824 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  /* Layout with sidebar */
+  .constitution-wrapper {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 1024px) {
+    .constitution-wrapper {
+      grid-template-columns: 1fr;
+    }
+    .sidebar-nav {
+      position: relative;
+      top: auto;
+    }
+  }
+
+  .sidebar-nav {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+    background: #f8f9fa;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-nav h3 {
+    margin: 0 0 1rem 0;
+    color: #1e3a8a;
+    font-size: 1rem;
+  }
+
+  .sidebar-nav .search-box {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+  }
+
+  .sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .sidebar-nav li {
+    margin: 0.25rem 0;
+  }
+
+  .sidebar-nav a {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    color: #1e3a8a;
+    text-decoration: none;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+
+  .sidebar-nav a:hover {
+    background-color: #e5e7eb;
+    border-left-color: #1e3a8a;
+    padding-left: 1rem;
+  }
+
+  .sidebar-nav a.active {
+    background-color: #dbeafe;
+    color: #1e3a8a;
+    font-weight: 600;
+    border-left-color: #1e3a8a;
+  }
+
+  .sidebar-level-2 {
+    margin-left: 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .constitution-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1f2937 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .constitution-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+  }
+  
+  .constitution-metadata {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin: 0.5rem 0;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .action-buttons button {
+    padding: 0.6rem 1.2rem;
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+  }
+
+  .action-buttons button:hover {
+    background: #1e3a8a;
+    opacity: 0.9;
+  }
+
+  .action-buttons button.secondary {
+    background: #6b7280;
+  }
+
+  .action-buttons button.secondary:hover {
+    background: #4b5563;
+  }
+  
+  .toc-container {
+    background: #f3f4f6;
+    border-left: 4px solid #1e3a8a;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 0.25rem;
+  }
+  
+  .toc-container h2 {
+    margin-top: 0;
+    color: #1e3a8a;
+  }
+  
+  .toc-list {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .toc-list li {
+    margin: 0.5rem 0;
+  }
+  
+  .toc-list a {
+    color: #1e3a8a;
+    text-decoration: none;
+    border-bottom: 1px dotted #1e3a8a;
+  }
+  
+  .toc-list a:hover {
+    background-color: #e5e7eb;
+  }
+  
+  .toc-level-2 {
+    margin-left: 1rem;
+  }
+  
+  .toc-level-3 {
+    margin-left: 2rem;
+  }
+  
+  .constitution-content {
+    line-height: 1.7;
+    color: #1f2937;
+  }
+
+  .collapsible-section {
+    margin: 1.5rem 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    overflow: hidden;
+  }
+
+  .section-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f3f4f6;
+    padding: 1rem;
+    cursor: pointer;
+    user-select: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e3a8a;
+    transition: background 0.2s;
+  }
+
+  .section-toggle:hover {
+    background: #e5e7eb;
+  }
+
+  .section-toggle.collapsed::before {
+    content: "▶ ";
+    margin-right: 0.5rem;
+  }
+
+  .section-toggle.expanded::before {
+    content: "▼ ";
+    margin-right: 0.5rem;
+  }
+
+  .section-content {
+    padding: 1.5rem;
+    display: none;
+  }
+
+  .section-content.show {
+    display: block;
+  }
+  
+  .constitution-content h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-top: 0;
+    border-top: none;
+    color: #1e3a8a;
+    font-size: 1.5rem;
+  }
+
+  .constitution-content h2.section-number {
+    color: #1e3a8a;
+  }
+  
+  .constitution-content h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: #374151;
+    font-size: 1.125rem;
+  }
+  
+  .constitution-content h4 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    color: #4b5563;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  
+  .section-anchor {
+    color: #9ca3af;
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+  }
+
+  .key-points {
+    background: #dcfce7;
+    border-left: 4px solid #22c55e;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+    border-radius: 0.25rem;
+  }
+
+  .key-points strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #15803d;
+    font-size: 0.95rem;
+  }
+
+  .key-points ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #166534;
+  }
+
+  .key-points li {
+    margin: 0.5rem 0;
+  }
+  
+  .preamble {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    border-radius: 0.25rem;
+  }
+  
+  .preamble strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #92400e;
+  }
+  
+  .subsection-list {
+    margin: 1rem 0;
+    padding-left: 2rem;
+  }
+  
+  .subsection-list li {
+    margin: 0.5rem 0;
+  }
+
+  .search-highlight {
+    background-color: #fbbf24;
+    padding: 0.1rem 0.3rem;
+    border-radius: 0.2rem;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+    font-size: 1.125rem;
+  }
+
+  @media print {
+    .sidebar-nav,
+    .action-buttons,
+    .constitution-header,
+    .toc-container {
+      display: none;
+    }
+    .constitution-wrapper {
+      grid-template-columns: 1fr;
+    }
+    .constitution-content {
+      background: white;
+    }
+    .section-toggle {
+      display: none;
+    }
+    .section-content {
+      display: block !important;
+      padding: 0 !important;
+    }
+  }
+</style>
+
+
+<div class="constitution-header">
+  <h1>Oscar Five Self Help Group</h1>
+  <div class="constitution-metadata">📋 <strong>Constitution Document</strong></div>
+  <div class="constitution-metadata">📍 Registered Office: Nairobi, Kenya</div>
+  <div class="constitution-metadata">📧 Email: Oscarfiveshg@gmail.com | ☎️ +254792331717</div>
+  <div class="constitution-metadata">✅ Adopted: 1st November 2022</div>
+</div>
+
+<div class="action-buttons">
+  <button onclick="window.print()">🖨️ Print Document</button>
+  <button class="secondary" onclick="downloadPDF()">📥 Download as PDF</button>
+  <button class="secondary" onclick="toggleAllSections()">📂 Expand/Collapse All</button>
+</div>
+
+<div class="constitution-wrapper">
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar-nav">
+    <h3>📑 Navigation</h3>
+    <input type="text" class="search-box" id="sidebarSearch" placeholder="Search sections...">
+    <ul id="sidebarList">
+      <li><a href="#preamble" data-section="preamble">Preamble & Background</a></li>
+      <li><a href="#sec-1" data-section="sec-1">1.0 Name</a></li>
+      <li><a href="#sec-2" data-section="sec-2">2.0 Registered Office</a></li>
+      <li><a href="#sec-3" data-section="sec-3">3.0 Vision</a></li>
+      <li><a href="#sec-4" data-section="sec-4">4.0 Mission</a></li>
+      <li><a href="#sec-5" data-section="sec-5">5.0 Aims & Objectives</a></li>
+      <li><a href="#sec-6" data-section="sec-6">6.0 Membership</a>
+        <ul class="sidebar-level-2">
+          <li><a href="#sec-6-1" data-section="sec-6-1">6.1 Admission</a></li>
+          <li><a href="#sec-6-2" data-section="sec-6-2">6.2 Membership Fee</a></li>
+          <li><a href="#sec-6-3" data-section="sec-6-3">6.3 Termination</a></li>
+          <li><a href="#sec-6-4" data-section="sec-6-4">6.4 Resignation</a></li>
+          <li><a href="#sec-6-5" data-section="sec-6-5">6.5 Consequences</a></li>
+        </ul>
+      </li>
+      <li><a href="#sec-7" data-section="sec-7">7.0 Finance & Assets</a></li>
+      <li><a href="#sec-8" data-section="sec-8">8.0 Executive Committee</a>
+        <ul class="sidebar-level-2">
+          <li><a href="#sec-8-1" data-section="sec-8-1">8.1 Office Bearers</a></li>
+          <li><a href="#sec-8-2" data-section="sec-8-2">8.2 Duties</a></li>
+        </ul>
+      </li>
+      <li><a href="#sec-9" data-section="sec-9">9.0 Elections</a></li>
+      <li><a href="#sec-10" data-section="sec-10">10.0 Resignation</a></li>
+      <li><a href="#sec-11" data-section="sec-11">11.0 Removal</a></li>
+      <li><a href="#sec-12" data-section="sec-12">12.0 Committees</a></li>
+      <li><a href="#sec-13" data-section="sec-13">13.0 Meetings</a></li>
+      <li><a href="#sec-14" data-section="sec-14">14.0 Special Meetings</a></li>
+      <li><a href="#sec-15" data-section="sec-15">15.0 Other Meetings</a></li>
+      <li><a href="#sec-16" data-section="sec-16">16.0 Fines & Penalties</a></li>
+      <li><a href="#sec-17" data-section="sec-17">17.0 Support Services</a></li>
+      <li><a href="#sec-18" data-section="sec-18">18.0 Dissolution</a></li>
+      <li><a href="#sec-19" data-section="sec-19">19.0 Amendment</a></li>
+      <li><a href="#signatories" data-section="signatories">Signatories</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+<div class="toc-container">
+  <h2>📑 Table of Contents</h2>
+  <ul class="toc-list">
+    <li><a href="#preamble">Preamble & Background</a></li>
+    <li><a href="#sec-1">1.0 Name</a></li>
+    <li><a href="#sec-2">2.0 Registered Office</a></li>
+    <li><a href="#sec-3">3.0 Vision</a></li>
+    <li><a href="#sec-4">4.0 Mission</a></li>
+    <li><a href="#sec-5">5.0 Aims and Objectives</a></li>
+    <li><a href="#sec-6">6.0 Membership</a>
+      <ul class="toc-list toc-level-2">
+        <li><a href="#sec-6-1">6.1 Admission of Members</a></li>
+        <li><a href="#sec-6-2">6.2 Membership Fee</a></li>
+        <li><a href="#sec-6-3">6.3 Termination of Membership</a></li>
+        <li><a href="#sec-6-4">6.4 Resignation of a Member</a></li>
+        <li><a href="#sec-6-5">6.5 Consequences of Exit</a></li>
+      </ul>
+    </li>
+    <li><a href="#sec-7">7.0 Finance and Assets</a></li>
+    <li><a href="#sec-8">8.0 The Executive Committee</a>
+      <ul class="toc-list toc-level-2">
+        <li><a href="#sec-8-1">8.1 Office Bearers</a></li>
+        <li><a href="#sec-8-2">8.2 Duties of Key Office Bearers</a></li>
+      </ul>
+    </li>
+    <li><a href="#sec-9">9.0 Elections to the Executive Committee</a></li>
+    <li><a href="#sec-10">10.0 Resignation from Executive Committee</a></li>
+    <li><a href="#sec-11">11.0 Removal of Officers Between Elections</a></li>
+    <li><a href="#sec-12">12.0 Committees</a></li>
+    <li><a href="#sec-13">13.0 Meetings</a></li>
+    <li><a href="#sec-14">14.0 Special General Meetings</a></li>
+    <li><a href="#sec-15">15.0 Executive & Other Meetings</a></li>
+    <li><a href="#sec-16">16.0 Fines and Penalties</a></li>
+    <li><a href="#sec-17">17.0 Support Offered by the Association</a></li>
+    <li><a href="#sec-18">18.0 Dissolution</a></li>
+    <li><a href="#sec-19">19.0 Amendment to the Constitution</a></li>
+    <li><a href="#signatories">Signatories</a></li>
+  </ul>
+</div>
+
+<article class="constitution-content">
+
+<!-- Preamble -->
+<section id="preamble">
+  <h2>Preamble & Background</h2>
+  
+  <div class="preamble">
+    <strong>We, the Administration Police Officers recruited in the year 2005</strong> are desirous of forming ourselves into a Savings, Welfare and Investment community in order to provide financial and non-financial support services to members through and under the strict mandate of activities under the Savings, Welfare and Investment Community. It is upon this context that we do hereby establish, adopt, enact and give this constitution to ourselves and our posterity.
+  </div>
+  
+  <h3>Background and Rationale</h3>
+  <p>This group is a Member Owned Institution (MOI) where the main source of funds shall be member equity/contributions. Any other source of funds such as loans from Saccos or Banks shall be as agreed by members in accordance with this Constitution. The concept of the group is anchored in the premise of unity, that our unity is our strength both on welfare matters and that savings services are so rare that people often pay for them instead of earning interest on them. The concept therefore makes use of the social capital (social networks and relationships) to actualise financial capital (member equity and savings) for the benefit of group members.</p>
+  
+  <p><strong>The group shall be apolitical and non-partisan.</strong></p>
+  
+  <h3>What Makes Us a Member Owned Institution (MOI)</h3>
+  <ul class="subsection-list">
+    <li><strong>i. Source of Funds:</strong> Internally generated funds (usually in the form of savings and/or member equity)</li>
+    <li><strong>ii. Ownership and Control:</strong> Decision-making (and related costs and benefits) lie with the members</li>
+  </ul>
+</section>
+
+<!-- Section 1 -->
+<section id="sec-1">
+  <h2>1.0 Name <a href="#sec-1" class="section-anchor">¶</a></h2>
+  <p>The name of this association shall be <strong>"Oscar Five Self Help Group."</strong></p>
+</section>
+
+<!-- Section 2 -->
+<section id="sec-2">
+  <h2>2.0 Registered Office <a href="#sec-2" class="section-anchor">¶</a></h2>
+  
+  <h3 id="sec-2-1">2.1 Location</h3>
+  <p>The registered office shall be in Nairobi where all activities are undertaken unless decided otherwise by the association.</p>
+  
+  <h3 id="sec-2-2">2.2 Correspondence Details</h3>
+  <p>Correspondence shall be through the Chairperson:</p>
+  <ul class="subsection-list">
+    <li><strong>P.O. Box:</strong> Private Bag, Nairobi</li>
+    <li><strong>Email:</strong> Oscarfiveshg@gmail.com</li>
+    <li><strong>Mobile:</strong> +254792331717</li>
+  </ul>
+</section>
+
+<!-- Section 3 -->
+<section id="sec-3">
+  <h2>3.0 Vision <a href="#sec-3" class="section-anchor">¶</a></h2>
+  <p>To be a vibrant and self-reliant community of persons that responds to member's financial and non-financial needs with integrity.</p>
+</section>
+
+<!-- Section 4 -->
+<section id="sec-4">
+  <h2>4.0 Mission <a href="#sec-4" class="section-anchor">¶</a></h2>
+  <p>To be a unifying group that offers financial, social and moral support to its members through savings, welfare, investment activities and sharing investment ideas and creating a platform for discussing social aspects while respecting human dignity.</p>
+</section>
+
+<!-- Section 5 -->
+<section id="sec-5">
+  <h2>5.0 Aims and Objectives <a href="#sec-5" class="section-anchor">¶</a></h2>
+  <ul class="subsection-list">
+    <li><strong>5.1</strong> To offer financial support to members on welfare matters</li>
+    <li><strong>5.2</strong> To encourage a culture of saving among members</li>
+    <li><strong>5.3</strong> To invest in various sectors including but not limited to real estate</li>
+  </ul>
+</section>
+
+<!-- Section 6 -->
+<section id="sec-6">
+  <h2>6.0 Membership <a href="#sec-6" class="section-anchor">¶</a></h2>
+  
+  <h3 id="sec-6-1">6.1 Admission of Members</h3>
+  
+  <div class="key-points">
+    <strong>🎯 Membership Requirements:</strong>
+    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li>Must be an Administration Police Officer recruited in 2005</li>
+      <li>Subject to character evaluation by existing members</li>
+      <li>Maximum membership: <strong>115 members</strong></li>
+      <li>New admissions/replacements require approval by <strong>2/3 (two-thirds) majority</strong></li>
+    </ul>
+  </div>
+  
+  <div style="background: #ede9fe; border-left: 4px solid #a855f7; padding: 1.25rem; margin: 1.5rem 0; border-radius: 0.25rem;">
+    <strong>✅ Critical Attributes for Group Members:</strong>
+    <p style="margin: 0.5rem 0;">All members MUST demonstrate:</p>
+    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li>Commitment to the group's cause</li>
+      <li>Trustworthiness and Honesty</li>
+      <li>Respect and Open-mindedness</li>
+      <li>Development consciousness</li>
+      <li>Unity of purpose and Integrity</li>
+    </ul>
+  </div>
+  
+  <ul class="subsection-list">
+    <li><strong>6.1.1</strong> Membership to the Association shall be drawn from administration police officers recruited in the year 2005, subject to character evaluation by the existing/on-going members.</li>
+    <li><strong>6.1.2</strong> All members must be registered as provided for in the Association's Constitution and policies.</li>
+    <li><strong>6.1.3</strong> Membership shall be capped at one hundred and fifteen (115) members.</li>
+    <li><strong>6.1.4</strong> Having completed the official registration of members on 4th July 2019, any further admissions or replacement of members must be approved by two-thirds (2/3) of the members.</li>
+  </ul>
+  
+  <h3 id="sec-6-2">6.2 Membership Fee</h3>
+  
+  <div class="key-points">
+    <strong>💳 Fee Structure for New Members (Effective 30th June 2019)</strong>
+    <p>All fees must be paid BEFORE admission is approved.</p>
+  </div>
+  
+  <div style="overflow-x: auto; margin: 1.5rem 0;">
+    <table style="width: 100%; border-collapse: collapse; border: 1px solid #d1d5db; background: white;">
+      <thead>
+        <tr style="background-color: #1e3a8a; color: white;">
+          <th style="border: 1px solid #d1d5db; padding: 1rem; text-align: left;">Fee Type</th>
+          <th style="border: 1px solid #d1d5db; padding: 1rem; text-align: center;">Amount (KShs)</th>
+          <th style="border: 1px solid #d1d5db; padding: 1rem; text-align: left;">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background-color: #f9fafb;">
+          <td style="border: 1px solid #d1d5db; padding: 1rem;"><strong>Registration Fee</strong></td>
+          <td style="border: 1px solid #d1d5db; padding: 1rem; text-align: center;"><strong>1,000</strong></td>
+          <td style="border: 1px solid #d1d5db; padding: 1rem;">Non-refundable. One-time only. Paid once upon joining.</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #d1d5db; padding: 1rem;"><strong>Equalization Amount</strong></td>
+          <td style="border: 1px solid #d1d5db; padding: 1rem; text-align: center;"><strong>Variable*</strong></td>
+          <td style="border: 1px solid #d1d5db; padding: 1rem;">Equal to total contributions already paid by existing members</td>
+        </tr>
+        <tr style="background-color: #f9fafb;">
+          <td style="border: 1px solid #d1d5db; padding: 1rem;"><strong>Annual Fee (Per Year)</strong></td>
+          <td style="border: 1px solid #d1d5db; padding: 1rem; text-align: center;"><strong>5,000</strong></td>
+          <td style="border: 1px solid #d1d5db; padding: 1rem;">Non-refundable. For each year the Association has existed since inception</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="key-points">
+    <strong>ℹ️ Important Notes:</strong>
+    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li><strong>*Variable Amount:</strong> Contact the Treasurer for current amount based on existing members' contributions</li>
+      <li><strong>Special Members:</strong> Spouses, siblings, or relatives are treated as INDIVIDUAL members with separate obligations</li>
+      <li><strong>Non-Refundable:</strong> Registration and annual fees are NOT refundable under any circumstances</li>
+      <li><strong>Payment Deadline:</strong> All fees must be paid BEFORE admission is officially approved</li>
+    </ul>
+  </div>
+  
+  <div style="background: #f0f9ff; border-left: 4px solid #0284c7; padding: 1.25rem; margin: 1.5rem 0; border-radius: 0.25rem;">
+    <strong>📋 Example: New Member Joining in 2026</strong>
+    <p style="margin: 0.5rem 0;">If the Association has been in existence since November 2022 (3+ years) and members have contributed Kshs 20,000 each:</p>
+    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li>Registration Fee: <strong>Kshs 1,000</strong></li>
+      <li>Equalization Amount: <strong>Kshs 20,000</strong> (current member amount)</li>
+      <li>Annual Fees: <strong>Kshs 15,000</strong> (3 years × Kshs 5,000)</li>
+      <li><strong>TOTAL: Kshs 36,000</strong></li>
+    </ul>
+  </div>
+  
+  <h3 id="sec-6-3">6.3 Termination of Membership</h3>
+  
+  <div class="key-points">
+    <strong>⚠️ Automatic Termination Triggers:</strong>
+    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li><strong>Non-payment:</strong> 3 consecutive months of contribution non-payment (after 7-day notice)</li>
+      <li><strong>Discipline:</strong> Violation of Constitution, rules, or regulations (requires 2/3 majority vote)</li>
+      <li><strong>Attendance:</strong> 3 consecutive physical meeting absences (results in summons + penalty)</li>
+      <li><strong>WhatsApp Removal:</strong> Can be temporary for indiscipline or non-payment (3+ months)</li>
+    </ul>
+  </div>
+  
+  <ul class="subsection-list">
+    <li><strong>6.3.1</strong> Membership may be terminated for non-payment of the monthly contributions for consecutive three (3) months upon a seven (7) day written notice from the secretary for the member to make good his or her debt. If the member fails to make the required payments within the said notice period, his/her membership shall stand terminated.</li>
+    <li><strong>6.3.2</strong> Failure of members to observe this Constitution, rules and regulations of the Association shall result in termination of membership subject to a decision made by the executive committee and voted for by a 2/3rd majority in the general assembly.</li>
+    <li><strong>6.3.3</strong> Failure by a member to attend three (3) consecutive physical meetings shall warrant summons by the executive and appropriate penalty be administered.</li>
+    <li><strong>6.3.4</strong> The Executive Committee shall have the power to temporarily remove a member from the WhatsApp forum on the basis of indiscipline, non-payment for three consecutive months, non-payment of the required contributions or when the members need to discuss the welfare or disciplinary issues relating to a given member.</li>
+  </ul>
+  
+  <h3 id="sec-6-4">6.4 Resignation of a Member</h3>
+  
+  <div class="key-points">
+    <strong>📝 Voluntary Exit Process:</strong>
+    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li>Submit <strong>90-day written notice</strong> to the Chairman</li>
+      <li>Process through your regional representative</li>
+      <li>Allow 3 months for all administrative closure</li>
+    </ul>
+  </div>
+  
+  <p>Members may terminate their membership by a 90 days written notice to the Chairman of the Association through their regional representatives.</p>
+  
+  <h3 id="sec-6-5">6.5 Consequences of Voluntary and Involuntary Exit from the Association</h3>
+  
+  <div style="overflow-x: auto; margin: 1.5rem 0;">
+    <table style="width: 100%; border-collapse: collapse; border: 1px solid #d1d5db; background: white;">
+      <thead>
+        <tr style="background-color: #7c2d12; color: white;">
+          <th style="border: 1px solid #d1d5db; padding: 1rem; text-align: left;">Exit Type</th>
+          <th style="border: 1px solid #d1d5db; padding: 1rem; text-align: left;">What Member Receives</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background-color: #f9fafb;">
+          <td style="border: 1px solid #d1d5db; padding: 1rem;"><strong>Voluntary Exit (90-day notice)</strong></td>
+          <td style="border: 1px solid #d1d5db; padding: 1rem;">Savings + Prorated returns - 20% of shares - Any debts/liabilities owed</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #d1d5db; padding: 1rem;"><strong>Involuntary Exit (Death)</strong></td>
+          <td style="border: 1px solid #d1d5db; padding: 1rem;">All benefits to next of kin/beneficiaries (savings less group debts)</td>
+        </tr>
+        <tr style="background-color: #f9fafb;">
+          <td style="border: 1px solid #d1d5db; padding: 1rem;"><strong>Expulsion (Misconduct/Non-payment)</strong></td>
+          <td style="border: 1px solid #d1d5db; padding: 1rem;">Savings less 20% + group liabilities. Paid once yearly on agreed date</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="key-points">
+    <strong>🚫 Expulsion Grounds (20% Penalty Applied):</strong>
+    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li>Failing to make regular saving deposits more than 3 times</li>
+      <li>Default in contributions towards another member's welfare</li>
+      <li>Failing to pay penalties and fines</li>
+      <li>Gross misconduct</li>
+    </ul>
+  </div>
+  
+  <ul class="subsection-list">
+    <li><strong>6.5.1</strong> Any member exiting the Association on his/her own volition shall be refunded their savings and prorated returns less 20% of his or her shares and less any liabilities or debts incurred as an individual or jointly with the group.</li>
+    <li><strong>6.5.2</strong> Any member exiting the association due to involuntary grounds such as death, the next of kin or beneficiaries shall be given all the benefits due to him or her (savings as stated by the member less group debts/liabilities accrued).</li>
+    <li><strong>6.5.3</strong> If a member is expelled from the group for the following reasons, the group shall give him or her savings less group liabilities of 20% of the member's total savings plus prorated returns. The said refunds shall all be made once a year on the date agreed by the executive:
+      <ul style="margin-top: 0.5rem; margin-left: 2rem;">
+        <li>a. Failing to make regular saving deposits for more than three times</li>
+        <li>b. Default in contributions towards another member's welfare</li>
+        <li>c. Failing to pay penalties and fines</li>
+        <li>d. Gross misconduct</li>
+      </ul>
+    </li>
+  </ul>
+</section>
+
+<!-- Section 7 -->
+<section id="sec-7">
+  <h2>7.0 Finance and Assets (Funds) <a href="#sec-7" class="section-anchor">¶</a></h2>
+  
+  <div class="key-points">
+    <strong>💰 Fund Usage & Governance:</strong>
+    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li>Funds used ONLY for member welfare and group interests</li>
+      <li>Requires approval by at least 2/3 of members in AGM (with quorum)</li>
+      <li>All contributions channeled through Treasurer to group account</li>
+      <li>All financial documents available for member scrutiny on demand</li>
+    </ul>
+  </div>
+  
+  <h3>7.1-7.4 General Fund Management</h3>
+  <ul class="subsection-list">
+    <li><strong>7.1</strong> The funds of the Association shall only be used to enhance and safeguard the interest and welfare of its members in line with the objectives of the group as shall be agreed by at least two-thirds (2/3) of the members present in an AGM as long as quorum has been reached.</li>
+    <li><strong>7.2</strong> All contributions to the group shall be channelled to the treasurer, who in turn shall keep the funds in the group's account.</li>
+    <li><strong>7.3</strong> The funds of the Association shall be derived from member's monthly contributions, application fees, loans from financial institutions, loans and income from accumulated capital and investments.</li>
+    <li><strong>7.4</strong> These sources are not exclusive and may include other methods which shall be considered by the members from time to time.</li>
+  </ul>
+  
+  <h3>7.5-7.9 Bank Accounts & Financial Records</h3>
+  <ul class="subsection-list">
+    <li><strong>7.5</strong> The Association shall open and operate Bank Accounts in the name of the Association with reputable banks approved by the Executive Committee.</li>
+    <li><strong>7.6</strong> All the cheque books, ledger accounts, bank statements, banking and withdrawal documents of the national office shall be made available for scrutiny on demand by the members of the association.</li>
+    <li><strong>7.7</strong> All the Association's cheques shall be signed by any two of the appointed three signatories however one of the two signatories must be the Treasurer.</li>
+    <li><strong>7.8</strong> An auditor shall be appointed each year by the Annual General Meeting. The executive shall present at least three names or audit firms for approval of one of the Auditors. A consolidated audited account shall be presented each year at the Association's General Meeting. The Auditor shall be required to prepare the audit report twenty-one days before the AGM to enable circulation ahead of the next AGM. The Auditor shall work with the Supervisory committee.</li>
+    <li><strong>7.9</strong> Record for all monies received on behalf of the Association from all sources shall be kept by the treasurer.</li>
+  </ul>
+  
+  <h3>7.10-7.12 Asset Management</h3>
+  <ul class="subsection-list">
+    <li><strong>7.10</strong> The Association shall be able to acquire property and own assets. The property of the Association shall be in the form of tangible assets unless agreed otherwise by the majority of the members. Acquisition of property by the Association shall be on the basis that such an act would either benefit the Association financially or further the interests of the Association.</li>
+    <li><strong>7.11</strong> All the assets shall be acquired or registered in the Association's name or trustees for the Association. The said Trustees shall not be more than five persons and shall sign a Deed of Trust over the property.</li>
+    <li><strong>7.12</strong> Assets shall only be disposed of by approval of at least two-thirds (2/3) of the members in an Annual General Meeting. Any monies made from sale of investment shall either be shared between members or returned back to the Association for reinvestment.</li>
+  </ul>
+  
+  <h3 id="sec-7-13">7.13 Monthly Contributions</h3>
+  
+  <div class="key-points">
+    <strong>📊 Contribution Schedule:</strong>
+    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li><strong>Amount:</strong> Kshs. 1,000 per month (per member)</li>
+      <li><strong>Payment Window:</strong> 20th to 27th of each month</li>
+      <li><strong>Late Payment Penalty:</strong> 20% fine if paid 28th-30th</li>
+      <li><strong>Classification:</strong> Treated as member savings</li>
+      <li><strong>Amendment:</strong> Requires 2/3 majority vote in AGM to change amount</li>
+    </ul>
+  </div>
+  
+  <ul class="subsection-list">
+    <li>7.13.1 Every member shall contribute a sum of Kenya Shillings One Thousand (Kshs. 1,000) Only between 20th and 27th day of every month. Any payment made between 28th-30th day of the month shall attract a 20% fine.</li>
+    <li>7.13.2 The monthly contribution shall be treated as member savings.</li>
+    <li>7.13.3 In the event that members wish to review the amount contributable per month, the same must be voted for by at least 2/3rd majority of members present in an AGM.</li>
+  </ul>
+</section>
+
+<!-- Section 8 -->
+<section id="sec-8">
+  <h2>8.0 The Executive Committee <a href="#sec-8" class="section-anchor">¶</a></h2>
+  
+  <h3 id="sec-8-1">8.1 Office Bearers</h3>
+  
+  <div class="key-points">
+    <strong>🏛️ Executive Committee Structure (Must follow 2/3 gender rule):</strong>
+    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li>Chairperson + Assistant Chairperson</li>
+      <li>Secretary + Assistant Secretary</li>
+      <li>Treasurer + Overseer</li>
+      <li>3 Investment Advisors</li>
+      <li>7 Regional Representatives</li>
+      <li>3 Supervisory Committee Members</li>
+    </ul>
+  </div>
+  
+  <p>The following office bearers shall be in charge of managing the Association's meetings, administrative and operative functions relating to the group. The group shall endeavour to ensure that the 2/3rd gender rule is adhered to:</p>
+  <ul class="subsection-list">
+    <li>a) The Chairperson</li>
+    <li>b) The Assistant Chairperson</li>
+    <li>c) The Secretary</li>
+    <li>d) The Assistant Secretary</li>
+    <li>e) The Treasurer</li>
+    <li>f) The Overseer</li>
+    <li>g) 3 Investment Advisors</li>
+    <li>h) 7 Regional Representatives</li>
+    <li>i) 3 Supervisory Committee Members</li>
+  </ul>
+  
+  <h3 id="sec-8-2">8.2 Duties of Key Office Bearers</h3>
+  
+  <h4>8.2.1 The Chairperson</h4>
+  <ul class="subsection-list">
+    <li>a) Convening online and physical meetings</li>
+    <li>b) Chairing meetings with the option of delegating this function</li>
+    <li>c) Acting as one of the signatories to the group's financial transactions</li>
+    <li>d) Ensuring compliance to the constitution, rules and regulations</li>
+    <li>e) Undertaking any other duties as may be determined from time to time, provided such duties are consistent with the provisions of the constitution</li>
+  </ul>
+  
+  <h4>8.2.2 The Secretary</h4>
+  <ul class="subsection-list">
+    <li>a) Shall ensure proper keeping of records and will track all transactions taking place during the group's meetings</li>
+    <li>b) Under the direction of the chair, the Secretary shall send notice of all meetings to the members along with an agenda not less than seven (7) days before any such meeting and in case of AGM, within twenty-one (21) days</li>
+    <li>c) He/she will keep both the soft and hard copy of the group ledger, which shall include the names, contacts, nomination forms and any other crucial documents relating to the members. He/she shall send minutes of the Association's meetings and shall send updates of the group's meetings, not more than 7 days after the said meetings to the members via all the available and appropriate channels</li>
+    <li>d) The secretary shall also be a signatory to the group's financial transactions</li>
+    <li>e) The Secretary shall prepare and submit an annual report on the activities of the Association at the Annual General Meeting</li>
+    <li>f) The Secretary shall keep copies of the accounts records as shared by the Treasurer</li>
+  </ul>
+  
+  <h4>8.2.3 The Treasurer</h4>
+  <ul class="subsection-list">
+    <li>a) The Treasurer will collaborate with the secretary in supervising the movement of the group's funds from/to the group and bank</li>
+    <li>b) He/she shall also regularly furnish the group with account statements and shall be the mandatory signatory of the group's bank account in addition to any two others</li>
+    <li>c) The treasurer shall keep up to date books of accounts showing receipts and payments on behalf of the Association</li>
+    <li>d) The Treasurer shall advise the management committee on bank balances, withdrawals and deposits</li>
+    <li>e) The Treasurer shall work with the Secretary on receipting, and petty cash administration and shall also ensure proper keeping of financial documents. Regular availing and accounting of Petty cash shall be made to the Executive as determined by the executive members</li>
+    <li>f) The Treasurer shall prepare and present financial statements to the auditor and together with the auditor, prepare and present the audited report to the Annual General Meeting</li>
+  </ul>
+  
+  <h4>8.2.4 The Overseer</h4>
+  <p>The overseer's sole responsibility will be to make sure that there is prudent management of group's finances while taking care of the member's interests in the management and shall also be one of the signatories in the group bank account. The Overseer shall act as the link between the executive and the members. He/she shall have the powers to demand books of account for perusal which shall not be unreasonably denied by treasurer.</p>
+  
+  <h4>8.2.5 Regional Representatives</h4>
+  <ul class="subsection-list">
+    <li><strong>8.2.5.1</strong> The Regional Representatives shall represent the regional members in their particular regions which are Nairobi, Coast, Central, Western, Eastern, Nyanza, Rift Valley and North Eastern. The Executive Committee is at liberty to recommend amalgamation or sub-division of the regions, for approval in the AGM.</li>
+    <li><strong>8.2.5.2</strong> The Regional Representatives shall advise the executive committee any issues to do with the welfare of their regional members and shall take notice of resignation and handle any other concerns before the same is tabled before the executive.</li>
+  </ul>
+  
+  <h4>8.2.6 Investment Advisors</h4>
+  <p>The Executive upon taking office, shall appoint at least three members into the committee to act as investment advisors. These advisors shall form part of the committee for all purposes including the right to vote.</p>
+  
+  <h4>8.2.7 Supervisory Committee</h4>
+  <p>The Supervisory committee shall be nominated during the AGM. The team of three members will act as the association's internal auditors and will develop auditing tools and structures. This committee will work with the Treasurer and the appointed Auditor.</p>
+</section>
+
+<!-- Section 9 -->
+<section id="sec-9">
+  <h2>9.0 Elections to the Executive Committee <a href="#sec-9" class="section-anchor">¶</a></h2>
+  
+  <div class="key-points">
+    <strong>🗳️ Election Timeline & Eligibility:</strong>
+    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li><strong>When:</strong> Every 5-year term during Annual General Meetings</li>
+      <li><strong>Maximum:</strong> 2 five-year terms max for same individual</li>
+      <li><strong>Nomination:</strong> 7 days before election deadline</li>
+      <li><strong>Eligibility:</strong> Must be paid-up members with proper nomination</li>
+      <li><strong>Voting:</strong> Secret ballot, one vote per member</li>
+    </ul>
+  </div>
+  
+  <h3>Election Process (9.1-9.11)</h3>
+  <ul class="subsection-list">
+    <li><strong>9.1</strong> Elections shall be held in Annual General Meetings.</li>
+    <li><strong>9.2</strong> Every member will be eligible to serve for a maximum of two (2) five (5) year terms in the executive committee after being elected by a majority of members in an election to be held at the expiry of every term.</li>
+    <li><strong>9.3</strong> The account signatories will be changed once a new team takes office as the Executive Committee.</li>
+    <li><strong>9.4</strong> Duly filled nomination forms shall be received by the Secretary at least within seven (7) days before elections to be held at a given Annual General Election. Nomination of a prospective candidate can be done by one or more members.</li>
+    <li><strong>9.5</strong> The elections shall be coordinated by a Returning Officer, preferably an uninterested party appointed by the outgoing executive committee drawn from various professions such as auditors, lawyers, pastors etc.</li>
+    <li><strong>9.6</strong> The names of the nominated candidates shall be read and displayed clearly by the Secretary before the election, and the said nominated persons shall be called upon to confirm their interest in the nominated positions.</li>
+    <li><strong>9.7</strong> Just before the elections begins the returning officer shall, after consulting with the Secretary and the Treasurer, declare to the assembly that the candidates vying for the seats have been properly nominated and are paid up members of the Association.</li>
+    <li><strong>9.8</strong> The candidates for the Chairman shall be allowed up to 3 minutes each to address the General Assembly on the policies they plan to implement if elected. The rest of the candidates shall be given one (1) minute to address the members present.</li>
+    <li><strong>9.9</strong> All members with voting rights shall cast their votes for all available positions before tallying commences. Each member shall be entitled to one vote.</li>
+    <li><strong>9.10</strong> Election to membership of the committee shall be by secret vote.</li>
+    <li><strong>9.11</strong> The term of office shall be deemed to commence from the conclusion of the meeting during which the elections will take place and shall continue until the start of the next elections.</li>
+  </ul>
+</section>
+
+<!-- Section 10 -->
+<section id="sec-10">
+  <h2>10.0 Resignation from the National Executive Committee <a href="#sec-10" class="section-anchor">¶</a></h2>
+  
+  <ul class="subsection-list">
+    <li><strong>10.1</strong> Any member of the Executive Committee shall be free to resign from office for whatever reason at any time during the tenure of office, provided s/he writes a letter of resignation to the Chairman, stating his reasons for resignation. When the Chairperson wishes to exit office, s/he shall write to the Vice Chair.</li>
+    <li><strong>10.2</strong> If any member of the committee ceases for any cause to be a member of the Association, or dies in office, resigns or is forced out of office due to misconduct or proven inefficiency he ipso facto ceases to be a member of the committee.</li>
+    <li><strong>10.3</strong> Any vacancies arising in the committee for whatever reason shall be filled by cooption by the remaining committee members, to be effective until the next general assembly.</li>
+  </ul>
+</section>
+
+<!-- Section 11 -->
+<section id="sec-11">
+  <h2>11.0 Removal of Officers from Their Positions Between Elections <a href="#sec-11" class="section-anchor">¶</a></h2>
+  
+  <ul class="subsection-list">
+    <li><strong>11.1</strong> Any member can call for the removal of one member of the executive committee through a vote of no confidence.</li>
+    <li><strong>11.2</strong> A notice of no confidence motion and vote shall be sent to the secretary, or to the chairman if the secretary is the one affected, or to the overseer if both the chair and secretary affected by the vote of no confidence. The vote of no confidence shall cite the reasons why the members should remove them from their positions. The reasons if not obvious (e.g., lunacy, bankruptcy of the member and does not attend the meeting as they ought to etc.), the member who brings the motion should prove their lack of confidence in the official. A vote of no confidence shall be deemed to have been passed if 2/3 (two thirds) of the total members present in an AGM vote in favour of the no confidence vote. In case of a tie, the chair or the temporary chair will have a casting vote. If the vote is passed by a majority of the members, the member must step down from the management committee immediately and another member be elected to the same position in accordance with this constitution.</li>
+  </ul>
+</section>
+
+<!-- Section 12 -->
+<section id="sec-12">
+  <h2>12.0 Committees <a href="#sec-12" class="section-anchor">¶</a></h2>
+  
+  <p>A committee shall be constituted to oversee the implementation of any of the group investment objectives.</p>
+  
+  <p>The Executive Committee may from time to time recommend creation of other committees in Annual General Meetings for approval by at least two-thirds (2/3) of the members present.</p>
+</section>
+
+<!-- Section 13 -->
+<section id="sec-13">
+  <h2>13.0 Meetings <a href="#sec-13" class="section-anchor">¶</a></h2>
+  
+  <h3>13.1 The Annual General Meeting (AGM)</h3>
+  
+  <div class="key-points">
+    <strong>📅 AGM Key Requirements:</strong>
+    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li><strong>Schedule:</strong> Every second Thursday of August, annually</li>
+      <li><strong>Notice Period:</strong> Minimum 21 days written notice required</li>
+      <li><strong>Cost:</strong> Kshs 2,000 per member (due by June 30th) - Non-payment = automatic dismissal</li>
+      <li><strong>Quorum:</strong> Minimum 45% of registered members required</li>
+      <li><strong>Voting:</strong> Requires 2/3 majority for major decisions</li>
+    </ul>
+  </div>
+  
+  <ul class="subsection-list">
+    <li><strong>13.1.1</strong> The AGM shall be held every second Thursday of August every year.</li>
+    <li><strong>13.1.2</strong> The cost of holding an AGM will be a one-off annual contribution of Kshs 2,000 from each member which must be paid on any convenient date by the member but not later than 30th June. Any member who fails to pay the AGM will out rightly be dismissed from the group.</li>
+    <li><strong>13.1.3</strong> The AGM's venue across various regions shall be as voted for during the current AGM.</li>
+    <li><strong>13.1.4</strong> The Notice of intention to hold an Annual General Meeting shall be sent to the last known electronic address/WhatsApp of each member not less than twenty-one (21) days before the date thereof.</li>
+    <li><strong>13.1.5</strong> The agenda for the Annual General Meeting shall be sent together with the notice.</li>
+    <li><strong>13.1.6</strong> The quorum for the Annual General Meeting shall not be less than 45% of the registered members of the Association.</li>
+    <li><strong>13.1.7</strong> The business of the Annual General Meeting shall be to:
+      <ul style="margin-top: 0.5rem; margin-left: 2rem;">
+        <li>a) To receive the Chairman's address which shall be based on the focus of the Association</li>
+        <li>b) To receive the Secretary's report that shall be based on the activities of the Association throughout the year</li>
+        <li>c) To receive the Treasurer's report which shall give a financial review of the affairs of the Association and present audited accounts and the Auditor's Report. The Treasurer's and Auditor's reports shall have been distributed to the members with the agenda to allow the members to study it before it is tabled</li>
+        <li>d) Elections</li>
+        <li>e) Any other business as presented to the secretary beforehand</li>
+      </ul>
+    </li>
+    <li><strong>13.1.8</strong> All Motions intended for discussion during the Annual General Meeting by a member shall be submitted in writing signed by a proposer and seconder and received by the Secretary at least 2 days before the date of the Annual General Meeting. The introduction of the motion for discussion shall be done by the proposer.</li>
+    <li><strong>13.1.9</strong> The minutes of the previous General Meeting shall be circulated to all paid up members with the agenda in such manner and in such form as the Executive Committee deem appropriate.</li>
+    <li><strong>13.1.10</strong> All members shall be bound by all decisions passed during the AGM under this constitution his or her presence/attendance notwithstanding.</li>
+  </ul>
+</section>
+
+<!-- Section 14 -->
+<section id="sec-14">
+  <h2>14.0 Special General Meetings <a href="#sec-14" class="section-anchor">¶</a></h2>
+  
+  <ul class="subsection-list">
+    <li><strong>14.1.1</strong> A Special General Meeting shall be held after at least three weeks' notice which includes the Agenda sent to all members.</li>
+    <li><strong>14.1.2</strong> A Special General Meeting may be convened by the Chairman on his own motion, the Executive Committee on agreed motion or at least fifty (50) ordinary members signing a motion submitted to the Executive Committee asking for Special General Meeting to be called.</li>
+    <li><strong>14.1.3</strong> The quorum for a Special General Meeting shall be at least a fourth of registered members but may not conduct any business that requires at least a 2/3 of members to endorse.</li>
+  </ul>
+</section>
+
+<!-- Section 15 -->
+<section id="sec-15">
+  <h2>15.0 Executive & Other General Meetings <a href="#sec-15" class="section-anchor">¶</a></h2>
+  
+  <h3>15.1 Executive Meetings</h3>
+  <ul class="subsection-list">
+    <li><strong>15.1.1</strong> The executive committee shall hold meetings as regularly as necessary, but not less than four times annually.</li>
+    <li><strong>15.1.2</strong> Executive meetings shall have a quorum of seven (7) persons.</li>
+    <li><strong>15.1.3</strong> The meetings shall be convened by the Chairperson.</li>
+    <li><strong>15.1.4</strong> The dates and times shall be at the discretion of the majority members of the committee.</li>
+    <li><strong>15.1.5</strong> Each member of the Executive Committee shall have one vote and the Chairman shall have an original and a casting vote.</li>
+    <li><strong>15.1.6</strong> The Executive Committee shall have power to determine its own procedures.</li>
+    <li><strong>15.1.7</strong> If any member of the Executive Committee fails to attend three consecutive meetings of the committee without apology or acceptable apology s/he shall be given notice by the Secretary, and he/she shall cease to be a member of the committee. The Executive Committee shall co-opt a member to replace those who cease to be members.</li>
+    <li><strong>15.1.8</strong> Every member of the Association will contribute Ksh 500 towards the officials' meetings to meet their transport and venue costs.</li>
+  </ul>
+  
+  <h3>15.2 Other General Meetings</h3>
+  <ul class="subsection-list">
+    <li><strong>15.2.1</strong> All general meetings shall be announced by the Chair through the secretary.</li>
+    <li><strong>15.2.2</strong> A notice of not less than seven (7) days shall be given to the members informing them of the said meeting. The notice shall be in writing text message/WhatsApp and the period thereof shall be exclusive of the day on which it is served or deemed to be served and of the day for which it is given and it shall specify the place, the day and the hour of meeting and, in the case of special business, the nature of such business.</li>
+    <li><strong>15.2.3</strong> It is acceptable to have the notice served via email, WhatsApp, or any other appropriate and effective forum.</li>
+    <li><strong>15.2.4</strong> The accidental omission to give notice of a meeting to, or the non-receipt of notice of a meeting by, any person entitled to receive notice shall not invalidate the proceedings of that meeting.</li>
+    <li><strong>15.2.5</strong> The Chairperson shall preside at every General Meeting, and if the Chairperson is not present (having notified the secretary of his absence one (1) week prior to the meeting) the Deputy Chairperson shall preside over the general meeting.</li>
+    <li><strong>15.2.6</strong> If neither the Chairperson nor the Assistant Chairperson is present, Members present shall choose one of their Members to be acting chairman so as to preside over the Meeting.</li>
+    <li><strong>15.2.7</strong> Every meeting shall be a savings, welfare or investment meeting.</li>
+    <li><strong>15.2.8</strong> The group's meetings shall follow the following order: Opening Prayers, opening remarks by the chair, register of attendance, deliberations and agenda of the day, A.O.B, Prayer and closure of meeting.</li>
+    <li><strong>15.2.9</strong> The online meetings shall be held at an appropriate time as deemed fit by the majority of the members.</li>
+    <li><strong>15.2.10</strong> The executive shall ensure that there have been at least three (3) general meetings a year, once every quarter, whether physically or virtually.</li>
+    <li><strong>15.2.11</strong> At any General Meeting an agenda put to the vote by the members shall be decided by a show of hands unless a poll is demanded by the chairman of the meeting or by any Member.</li>
+  </ul>
+</section>
+
+<!-- Section 16 -->
+<section id="sec-16">
+  <h2>16.0 Fines and Penalties <a href="#sec-16" class="section-anchor">¶</a></h2>
+  
+  <p><strong>The table below lists the fines that shall be levied against offences committed by members:</strong></p>
+  
+  <div style="overflow-x: auto; margin: 1.5rem 0;">
+    <table style="width: 100%; border-collapse: collapse; border: 1px solid #d1d5db;">
+      <thead>
+        <tr style="background-color: #1e3a8a; color: white;">
+          <th style="border: 1px solid #d1d5db; padding: 0.75rem; text-align: left;">Offence</th>
+          <th style="border: 1px solid #d1d5db; padding: 0.75rem; text-align: left;">Penalty</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background-color: #f9fafb;">
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">1. Late payment of welfare, investment and monthly contributions after the 10th day (one case)</td>
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">Temporary removal from WhatsApp, a 20% fine and a warning by the chair</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">2. Non-payment of welfare, investment and monthly contributions (3 times consecutively)</td>
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">Expulsion from the group and 20% fine plus liabilities</td>
+        </tr>
+        <tr style="background-color: #f9fafb;">
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">3. Showing disrespect and gross misconduct to members or officials during physical and online meetings</td>
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">Temporary removal from WhatsApp group and a fine of Ksh 1,000</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">4. Non-execution or poor handling of roles by officials</td>
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">Warning then replacement</td>
+        </tr>
+        <tr style="background-color: #f9fafb;">
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">5. Non-attendance of 1 physical meeting</td>
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">Ksh 1,000</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">6. Non-attendance of 2 consecutive physical meetings</td>
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">Ksh 3,000</td>
+        </tr>
+        <tr style="background-color: #f9fafb;">
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">7. Non-attendance of 3 consecutive physical meetings (with/without apology)</td>
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">Ksh 5,000</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">8. Non-attendance of 4 consecutive physical meetings</td>
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">Ksh 10,000 (Amended through the Eastern AGM Resolutions)</td>
+        </tr>
+        <tr style="background-color: #f9fafb;">
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">9. Non-payment of fines</td>
+          <td style="border: 1px solid #d1d5db; padding: 0.75rem;">Temporary removal and 20% fine</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Section 17 -->
+<section id="sec-17">
+  <h2>17.0 Support Offered by the Association <a href="#sec-17" class="section-anchor">¶</a></h2>
+  
+  <h3>Welfare/Social Fund</h3>
+  <p><strong>The types of benefits for which the social fund shall be used:</strong></p>
+  
+  <ul class="subsection-list">
+    <li><strong>i) Death of a member:</strong> Each member to contribute Ksh 1,000</li>
+    <li><strong>ii) Death of a spouse:</strong> Each member to contribute Ksh 500</li>
+    <li><strong>iii) Death of a child:</strong> Each member to contribute Ksh 500</li>
+    <li><strong>iv) Death of parents:</strong> Each member to contribute Ksh 500</li>
+    <li><strong>v) Deceased parents/guardians:</strong> In case any or both parents are deceased a member shall nominate two representatives as parents/guardians and a next of kin in the nomination form. The secretary shall ensure proper records are kept. An ID Copy or number in relation to each parent/guardian shall be filed at the point of nomination and upon death, the member shall provide a Burial permit or Death Certificate.</li>
+    <li><strong>vi) Social events:</strong> In case of any social event of a member or the group, the Association is at liberty to appoint a select committee which shall decide the budget and present it to the members for approval. This shall not be termed as a mandatory obligation.</li>
+    <li><strong>vii) Life-threatening sickness:</strong> In case a principal member suffers a life-threatening sickness due to accident, serious illness, terrorist attack/active shooter incident or any other work-related injury that exhausts the member financially beyond his means or that provided by NHIF leading to an accrued bill in excess of Ksh 250,000 over and above the NHIF provision, and in which case sufficient proof MUST be presented to the group, each member must contribute Ksh 1,000.</li>
+  </ul>
+</section>
+
+<!-- Section 18 -->
+<section id="sec-18">
+  <h2>18.0 Dissolution <a href="#sec-18" class="section-anchor">¶</a></h2>
+  
+  <p><strong>The group may be dissolved:</strong></p>
+  <ul class="subsection-list">
+    <li>a) When the group is declared bankrupt</li>
+    <li>b) By the government or court order</li>
+    <li>c) Voluntary winding up by members. This must be supported by 2/3 majority vote by the registered members during an AGM</li>
+  </ul>
+</section>
+
+<!-- Section 19 -->
+<section id="sec-19">
+  <h2>19.0 Amendment to the Constitution <a href="#sec-19" class="section-anchor">¶</a></h2>
+  
+  <ul class="subsection-list">
+    <li><strong>19.1</strong> Any member of the group may propose an amendment to this constitution 90 days prior to the AGM.</li>
+    <li><strong>19.2</strong> The number of members who shall agree before the constitution is amended shall be 2/3 of the members present.</li>
+    <li><strong>19.3</strong> The constitution shall come into force once it has been signed by all the executive members.</li>
+  </ul>
+</section>
+
+<!-- Signatories -->
+<section id="signatories">
+  <h2>Signatories <a href="#signatories" class="section-anchor">¶</a></h2>
+  
+  <div style="margin-top: 2rem;">
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="border-bottom: 2px solid #1f2937;">
+          <th style="padding: 1rem; text-align: left; font-weight: 600;">Title</th>
+          <th style="padding: 1rem; text-align: left; font-weight: 600;">Name</th>
+          <th style="padding: 1rem; text-align: left; font-weight: 600;">Date</th>
+          <th style="padding: 1rem; text-align: left; font-weight: 600;">Signature</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 1rem;">1. CHAIRMAN</td>
+          <td style="padding: 1rem;">________________</td>
+          <td style="padding: 1rem;">________________</td>
+          <td style="padding: 1rem;">________________</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 1rem;">2. SECRETARY</td>
+          <td style="padding: 1rem;">________________</td>
+          <td style="padding: 1rem;">________________</td>
+          <td style="padding: 1rem;">________________</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+          <td style="padding: 1rem;">3. TREASURER</td>
+          <td style="padding: 1rem;">________________</td>
+          <td style="padding: 1rem;">________________</td>
+          <td style="padding: 1rem;">________________</td>
+        </tr>
+        <tr>
+          <td style="padding: 1rem;">4. OVERSEER</td>
+          <td style="padding: 1rem;">________________</td>
+          <td style="padding: 1rem;">________________</td>
+          <td style="padding: 1rem;">________________</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</article>
+Preamble.
+We, the Administration Police Officers recruited in the year 2005 are desirous of forming
+ourselves into a Savings, Welfare and Investment community in order to provide financial and
+non financial support services to members through and under the strict mandate of activities
+under the Savings, Welfare and Investment Community. It is upon this context that we do
+hereby establish, adopt, enact and give thisconstitution to ourselves and ourposterity.
+Background and Rationale
+This group is a Member Owned Institution (MOI) where the main source of funds shall be
+memberequity/contributions. Any other source of funds such as loans from Saccos or Banks
+shall be as agreed by members in accordance with this Constitution. The concept of the
+group is anchored in the premise of unity, that our unity is our strength both on welfare
+matters and that savings services are so rare that people often pay for them instead of
+earning interest on them. The concept therefore makes use of the social capital (social
+networks and relationships) to actualise financial capital (member equity and savings) for
+the benefit of group members.
+The group shall be apolitical and non partisan.
+Two characteristics make this group a MemberOwned Institution (MOI) which include
+i.
+
+The source of funds/finance;internally generated funds (usuallyin the form of savings
+and ormemberequity); and
+
+ii. Ownership and control of the institution; decision making (and related costs and
+benefits) lie with the members.
+iii.
+1.0 NAME
+The name of this association shall be “Oscar Five Self Help Group.”
+2.0 REGISTERED OFFICE
+2.1 The registered office shall be in Nairobi where all activities are undertaken unless
+decided otherwise by the association.
+2.2 Correspondence shall be through the Chairperson, P.O Box, Private Bag, Nairobi.
+Email address Oscarfiveshg@gmail.com and mobile number+254792331717
+
+|P a g e
+
+3.0 VISION
+To be a vibrant and self reliant community of persons that responds to member’ s
+financial and non financial needs with integrity.
+4.0 MISSION
+To be a unifying group that offers financial, social and moral support to its members
+through savings, welfare, investment activities and sharing investment ideas and
+creating a platform for discussing social aspects while respecting human dignity
+5.0 AIMS AND OBJECTIVES
+5.1 To offer financial support to memberson welfare matters;
+5.2 To encourage a culture of saving among members; and
+5.3 To Invest in various sectorsincluding but not limited to real estate.
+6.0 MEMBERSHIP
+6.1 Admission of Members
+6.1.1 Membership to the Association shall be drawn from administration
+police officers recruited in the year 2005, subject to character
+evaluation by the existing/on-going members. The following attributes
+shall be critical to be a group member: Commitment to the cause of the
+group; -Trustworthiness; Honesty; Respect; Open minded and
+development consciousness; Unity of purpose and Integrity.
+6.1.2 All members must be registered as provided for in the Association’ s
+Constitution and policies
+6.1.3 Membership shall be capped at one hundred and fifteen (115)
+members.
+6.1.4 Having completed the official registration of members on 4th July, 2019
+any further admissions or replacement of members must be approved
+by two-thirds (2/3) of the members.
+6.2 Membership Fee
+6.2.1 Any new member with effect from 30th June, 2019 shall pay the
+following charges before admission:
+i)
+
+A non-refundable registration fee of Kenya Shillings One
+Thousand (Kshs.1,000) Only;
+
+ii)
+
+The sum of the total amount already paid by an individual
+existing member; and
+
+|P a g e
+
+iii)
+
+A non-refundable amount of Kenya Shillings Five
+Thousand
+
+(Kshs.5,000) Only
+
+for each year the
+
+Association has been inexistence.
+6.2.2
+
+“Special Members” such as a husband and wife, or siblings, or any
+other set of relatives shall be treated as individual members, as their
+contributions and obligations shall also apply to themindividually.
+
+6.3 Termination of Membership
+6.3.1 Membership may be terminated for non-payment of the monthly
+contributions for consecutive three (3) months upon a seven(7) day
+written notice from the secretary for the member to make good his or
+her debt. If the member fails to make the required payments within the
+said notice period, his/hermembership shall stand terminated.
+6.3.2 Failure of members to observe this Constitution, rules and regulations
+of the Association shall result in termination of membership subject to
+a decision made by the executive committee and voted for by a 2/3rd
+majority in the general assembly.
+6.3.3 Failure by a member to attend three (3) consecutive physical meetings
+shall warrant summons by the executive and appropriate penalty be
+administered.
+6.3.4 The Executive Committee shall have the power to temporarily remove a
+member from the WhatsApp forum albeit temporarily on the basis of
+indiscipline, non-payment for three consecutive months, non-payment
+of the required contributions or when the members need to discuss the
+welfare ordisciplinary issues relating to a given member.
+6.4 Resignation Of a Member
+Members may terminate their membership by a 90 days written notice to the
+Chairman of the Associationthroughtheir regional representatives.
+6.5 Consequence Of Voluntary and InvoluntaryExit From The Association
+6.5.1 Any member exiting the Association on his/her own volition shall be
+refunded their savingsand prorated returns less 20% of his or her shares
+and less any liabilities or debts incurred as an individual or jointly with
+the group.
+6.5.2 Any member exiting the association due to involuntary grounds such as
+death, the next of kin or beneficiaries shall be given all the benefits due
+to him or her {savings as stated by the member less group
+debts/liabilities accrued.)
+
+|P a g e
+
+6.5.3 If a member is expelled from the group for the following reasons, the
+group shall give him or her savings less group liabilities of 20%of the
+members total savings plus prorated returns. The said refunds shall all
+be made once a yearon the date agreed by the executive:
+a. failing to make regular saving deposits for more than
+three times;
+b. Default in contributions towards another member’ s
+welfare;
+c. Failing to pay penalties and fines;or
+d. Gross misconduct.
+7.0 FINANCE AND ASSETS (FUNDS)
+7.1 The funds of the Association shall only be used to enhance and safeguard the
+interest and welfare of its members in line with the objectives of the group as shall
+be agreed by at least two-thirds (2/3) of the members of members present in an
+AGMas long as quorumhas beenreached.
+7.2 All contributions to the group shall be channelled to the treasurer, who in turn shall
+keep the funds in the groups account
+7.3 The funds of the Association shall be derived from member’ s monthly
+contributions, application fees, loans fromfinancial institutions, loans and income
+from accumulated capital and investments.
+7.4 These sources are not exclusive and may include other methods which shall be
+considered by the members fromtime to time.
+7.5 The Association shall open and operate Bank Accounts in the name of the
+Association with reputable banks approved by the Executive Committee.
+7.6 All the cheque books, ledger accounts, bank statements, banking and withdrawal
+documents of the national office shall be made available for scrutiny on demand
+by the members of the association.
+7.7 All the Association’ s cheques shall be signed by any two of the appointed three
+signatories howeverone of the two signatories must be the Treasurer.
+7.8 An auditor shall be appointed each year by the Annual General Meeting. The
+executive shall present at least three names or audit firms for approval of one of
+the Auditors. A consolidated audited account shall be presented each year at the
+Association's General Meeting. The Auditor shall be required to prepare the audit
+report twenty-one days before the AGM to enable circulation ahead of the next
+AGM. The Auditor shall work with the Supervisory committee.
+7.9 Record for all monies received on behalf of the Association from all sources shall
+be kept by the treasurer.
+
+|P a g e
+
+7.10
+
+The Association shall be able to acquire property and own assets. The property
+
+of the Association shall be in form of tangible assets unless agreed otherwise by
+the majority of the members. Acquisition of property by the Association shall be on
+the basis that suchan act would eitherbenefit the Association financiallyorfurther
+the interests of the Association
+7.11
+
+All the assets shall be acquired or registered in the Associations name or
+
+trustees for the Association. The said Trustees shall not be more than five persons
+and shall sign aDeed of Trust over the property.
+7.12
+
+Assets shall only be disposed of by approval of at least two-thirds (2/3) of the
+
+members in an Annual General Meeting. Any monies made from sale of
+investment shall either be shared between members or returned back to the
+Association for reinvestment.
+7.13
+
+Monthly Contributions
+7.13.1 Every member shall contribute a sum of Kenya Shillings One Thousand
+(Kshs.1000) Only between 20th and 27th day of every month. Any
+payment made between 28th -30th day of the month shall attract a 20%
+fine.
+7.13.2 The monthly contribution shall be treated as membersavings.
+7.13.3 In the event that members wish to review the amount contributable per
+month, the same must be voted forby at least 2-3rd majority of members
+present in an AGM.
+
+8.0 THE EXECUTIVE COMMITTEE
+8.1 The following office bearers shall be in charge of managing the Association’ s meetings,
+administrative and operative functions relating to the group. The group shall endeavour to
+ensure that the 2/3rd genderrule is adhered to:
+a) The Chairperson;
+b) The Assistant Chairperson;
+c) The Secretary;
+d) The Assistant Secretary;
+e) The Treasurer;
+f) The Overseer;
+g) 3 Investment Advisors; and
+h) 7 Regional Representatives.
+i)
+
+3 Supervisory committee members
+
+8.2 Duties of the Key Office Bearers
+
+|P a g e
+
+8.2.1 TheChairperson
+a) Convening online and physical meetings
+b) Chairing meetings with the option of delegating this function
+c) Acting asone of the signatories to the group’ s financial transactions
+d) Ensuring compliance to the constitution, rules and regulations
+e) Undertaking any other duties as may be determined from time to time, provided such
+duties are consistent with the provisionsof the constitution.
+
+8.2.2 The Secretary
+a) Shall ensure proper keeping of records and will track all transactions taking
+place during the groups meetings.
+b) Under the direction of the chair, the Secretary shall send notice of all meetings
+to the members along with an agenda not less than seven (7) days before any
+such meeting and incase of AGM, within twenty-one (21) days.
+c) He/she will keep both the soft and hard copy of the group ledger, which shall
+include the names, contacts, nomination forms and any other crucial
+documents relating to the members.
+
+He/she shall send minutes of the
+
+Association’ s meetings and shall send updates of the groups meetings, not
+more than 7days after the said meetings to the members via all the available
+and appropriate channels.
+d) The secretary shall also be a signatoryto the group’ s financial transactions.
+e) The Secretary shall prepare and submit an annual report on the activities of the
+Association at the Annual General Meeting.
+f) The Secretary shall keep copies of the accounts records as shared by the
+Treasurer.
+8.2.3 The Treasurer
+a) The Treasurer will collaborate with the secretary in supervising the movement
+of the group’ s funds from/to the group and bank.
+b) He/she shall also regularly furnish the group with account statements and
+shall be the mandatory signatory of the groups bank account in addition to any
+two others.
+c) The treasurer shall keep up to date books of accounts showing receipts and
+payments onbehalf of the Association.
+d) The Treasurer shall advise the management committee on bank balances,
+withdrawals and deposits.
+
+|P a g e
+
+e) The Treasurer shall work with the Secretary on receipting, and petty cash
+administration and shall also ensure proper keeping of financial documents.
+Regular availing and accounting of Petty cash shall be made to the Executive
+as determined by the executive members.
+f) The Treasurer shall prepare and present financial statements to the auditor
+and together with the auditor, prepare and present the audited report to the
+Annual General Meeting.
+
+8.2.4 The Overseer
+The overseer’ s sole responsibility will be to make sure that there is prudent
+management of groups finances while taking care of the member’ s interests in the
+management and shall also be one of the signatories in the group bank account. The
+Overseer shall act as the link between the executive and the members. He/she shall
+have the powers to demand books of account for perusal which shall not be
+unreasonably denied by treasurer.
+8.2.5 Regional Representatives
+8.2.5.1 The Regional Representatives shall represent the regional members in their
+particular regions which are Nairobi, Coast, Central, Western, Eastern, Nyanza, Rift Valley
+and North Eastern. The Executive Committee is at liberty to recommend amalgamation or
+sub-division of the regions, for approval inthe AGM.
+8.2.5.2 The Regional Representatives shall advise the executive committee any issues to
+do with the welfare of their regional members and shall take notice of resignation and
+handle any otherconcerns before the same is tabled before the executive.
+
+8.2.6 Investment Advisors
+The Executive upon taking office, shall appoint at least three members into the committee
+to act as investment advisors. These advisors shall form part of the committee for all
+purposes including the right to vote.
+8.2.7 Supervisory Committee
+The Supervisory committee shall be nominated during the AGM. The team of three
+members will act as the associations internal auditors and will develop auditing tools
+and structures. This committee will work with the Treasurer and the appointed
+Auditor.
+
+|P a g e
+
+9. TO THE EXECUTIVE COMMITTEE
+9.1 Elections shall be held in Annual General Meetings.
+9.2 Every memberwill be eligible to serve for a maximum of two {2} five {5}yearterm in
+the executive committee after being elected by a majority of members in an
+election to be held at the expiry of every term.
+9.3 The account signatories will be changed once a new team takes office as the
+Executive Committee.
+9.4 Duly filled nomination forms shall be received by the Secretary at least within
+seven (7) days before elections to be held at a given Annual General Election.
+Nomination of a prospective candidate can be done by one ormore members.
+9.5 The elections shall be coordinated by a Returning Officer, preferably an
+uninterested party appointed by the outgoing executive committee drawn from
+various professionssuch as auditors, lawyers, pastors etc.
+9.6 The names of the nominated candidates shall be read and displayed clearly by the
+Secretary before the election, and the said nominated persons shall be called
+upon to confirm theirinterest in the nominated positions.
+9.7 Just before the elections begins the returning officer shall, after consulting with
+the Secretary and the Treasurer, declare to the assembly that the candidates vying
+for the seats have been properly nominated and are paid up members of the
+Association.
+9.8 The candidates for the Chairman shall be allowed up to 3 minutes each to address
+the General Assembly on the policies they plan to implement if elected. The rest of
+the candidates shall be given one (1) minute to address the members present.
+9.9 All members with voting rights shall cast their votes for all available positions
+before tallying commences. Each membershall be entitled to one vote.
+9.10 Election to membership of the committee shall be by secret vote.
+9.11 The term of office shall be deemed to commence from the conclusion of the
+meeting during which the elections will take place and shall continue until the
+start of the next elections.
+10 RESIGNATION FROMTHE NATIONAL EXECUTIVE COMMITTEE
+10.1 Any member of the Executive Committee shall be free to resign from office for
+whatever reason at any time during the tenure of office, provided s/he writes a
+letter of resignation to the Chairman, stating his reasons for resignation. When the
+Chairperson wishesto exit office, S/he shall write to the Vice Chair.
+10.2 If any member of the committee ceases for any cause to be a member of the
+Association, or dies in office, resigns or is forced out of office due to misconduct
+or proveninefficiency he ipso facto ceasesto be a memberof the committee.
+
+|P a g e
+
+10.3 Any vacancies arising in the committee for whatever reason shall be filled by
+cooption by the remaining committee members, to be effective until the next
+general assembly.
+
+11 REMOVAL OF OFFICERS FROM THEIR POSITIONS BETWEENELECTIONS.
+11.1
+
+Any member can call for the removal of one member of the executive
+
+committee through a vote of no confidence.
+11.2
+
+A notice of no confidence motion and vote shall be sent to the secretary, or to
+
+the chairman if the secretary is the one affected, or to the overseer if both the chair
+and secretary affected by the vote of no confidence.
+The vote of no confidence shall cite the reasons why the members should
+remove them from their positions. The reasons if not obvious eg. Lunacy,
+bankruptcy of the member and does not attends the meeting as they ought to etc,
+the member who brings the motion should prove their lack of confidence in the
+official.
+A vote of no confidence shall be deemed to have been passed if 2/3 {two thirds}
+of the total members present in an AGM vote in favour of the no confidence vote.
+In case of a tie, the chair or the temporary chair will have a casting vote.
+If the vote is passed by a majority of the members, the member must step down
+from the management committee immediately and another member be elected
+to the same position in accordance with thisconstitution.
+
+12 COMMITTEES
+A committee shall be constituted to oversee the implementation of any of the
+group investment objectives
+The Executive Committee may from time to time recommend creation of other
+committees in Annual General Meetings for approval by at least two-thirds (2/3)
+of the members present.
+
+13.MEETINGS
+13.1
+
+The Annual General Meeting (AGM)
+
+13.1.1 The AGMshall be held every second Thursday of August every year.
+13.1.2 The cost of holding an AGM will be a one-off annual contribution of Kshs 2000
+from each member which must be paid on any convenient date by the member but not
+
+|P a g e
+
+later than 30th June. Any member who fails to pay the AGM will out rightly be dismissed
+from the group.
+13.1.3 The AGM’ s venue across various regions shall be as voted for during the current
+AGM.
+13.1.4 The Notice of intention to hold an Annual General Meeting shall be sent to the last
+known electronic address/WhatsApp of each member not less than twenty-one
+(21) daysbefore the date thereof.
+13.1.5 The agendafor the Annual General Meeting shall be sent together with the notice.
+13.1.6 The quorum for the Annual General Meeting shall not be less than a 45% of the
+registered members of the Association.
+13.1.7 The business of the Annual General Meeting shall be to:
+a) To receive the Chairman's address which shall be based on the focus of the
+Association
+b) To receive the Secretary's report that shall be based on the activities of the
+Association throughout the year.
+c) To receive the Treasurer's report which shall give a financial review of the affairs of the
+Association and present audited accounts and the Auditor’ sReport. The Treasurer's
+and Auditor’ s reports shall have been distributed to the members with the agenda to
+allow the members to study it before it is tabled.
+d) Elections
+e) Any otherbusiness as presented to the secretary beforehand
+13.1.8 All Motions intended for discussion during the Annual General Meeting by a
+member shall be submitted in writing signed by a proposer and seconder and
+received by the Secretary at least 2 days before the date of the Annual General
+Meeting. The introduction of the motion for discussion shall be done by the
+proposer.
+13.1.9 The minutes of the previous General Meeting shall be circulated to all paid up
+members with the agenda in such manner and in such form as the Executive
+Committee deem appropriate.
+13.1.10
+
+All members shall be bound by all decisions passed during the AGM under this
+constitution his orherpresence/attendance notwithstanding
+
+14.Special General Meetings
+14.1.1 A Special General Meeting shall be held after at least three weeks’
+includes the Agenda sent to all members.
+
+|P a g e
+
+14.1.2 A Special General Meeting may be convened by the Chairman on his own motion,
+the Executive Committee on agreed motion or at least fifty (50) ordinary members
+signing a motion submitted to the Executive Committee asking for Special
+General Meeting to be called.
+14.1.3 The quorum for a Special General Meeting shall be at least a fourth of registered
+members but may not conduct any business that require at least a 2/3 of
+members to endorse.
+15.1
+
+Executive Meetings
+
+15.1.1 The executive committee shall hold meetings as regularly as necessary, but not less
+thanfour times annually.
+15.1.2 Executive meetings shall have aquorumof seven (7) persons.
+15.1.3 The meetings shall be convened by the Chairperson
+15.1.4 The dates, times, shall be at the discretion of the majority members of the committee.
+15.1.5 Each member of the Executive Committee shall have one vote and the Chairman shall
+have an original and a casting vote.
+15.1.6 The Executive Committee shall have powerto determine its own procedures.
+15.1.7 If any member of the Executive Committee fails to attend three consecutive meetings
+of the committee without apology or acceptable apology s/he shall be given notice by
+the Secretary, and he/she shall cease to be a member of the committee. The Executive
+Committee shall co-opt a member to replace those who cease to be members.
+15.1.8 Every member of the Association will contribute Ksh 500 towards the officials’
+meetings to meet their transport and venue costs.
+15.2
+
+Other General Meetings
+
+15.2.1 All general meetings shall be announced by the Chairthrough the secretary.
+15.2.2 A notice of not lessthan seven (7) days shall be givento the members informing them
+of the said meeting. The notice shall be in writing text message/WhatsApp and the
+period thereof shall be exclusive of the day on which it is served ordeemed to be
+served and of the day for whichit isgivenand it shall specify the place, the day and the
+hour of meeting and, in the case of special business, the nature of such business.
+15.2.3 It isacceptable to have the notice served via email, WhatsApp, or any other
+appropriate and effective forum.
+15.2.4 The accidental omission to give notice of a meeting to, or the non-receipt of notice of a
+meeting by, any person entitled to receive notice shall not invalidate the proceedings
+of that meeting.
+15.2.5 The Chairperson shall preside at every General Meeting, and if the Chairperson is not
+present (having notified the secretary of his absence one (1) week prior to the
+meeting) the Deputy Chairperson shall preside overthe general meeting.
+
+|P a g e
+
+15.2.6 If neither is present the Chairperson nor the Assistant Chairperson, Members present
+shall choose one of their Members to be acting chairman so as to preside overthe
+Meeting.
+15.2.7 Every meeting shall be a savings, welfare orinvestment meeting.
+15.2.8 The groups meetingsshall follow the following order: Opening Prayers, opening
+remarks by the chair, register of attendance, deliberations and agenda of the day
+A.O.B, Prayer and closure of meeting.
+15.2.9 The online meetings shall be held at an appropriate time as deemed fit by the majority
+of the members
+15.2.10
+
+The executive shall ensure that there have been at least three (3) general
+
+meetings a year, once every quarter, whether physically or virtually.
+15.2.11
+
+At any General Meeting an agendaput to the vote by the members shall be
+decided by a show of hands unless a poll is demanded by the chairmanof the meeting
+or by any Member.
+
+16.0 FINES AND PENALTIES.
+The table belowlists the fines that shall be levied against offences committed by members.
+Offence
+
+Penalty
+
+1. Late payment of welfare, investment and monthly contributions Temporary removal from
+after the 10th day (one case)
+
+WhatsApp, a 20 % fine and a
+warning by the chair
+
+2. Non-payment of welfare, investment and monthly contributions (3
+times consecutively).
+
+Expulsion from the group
+and 20%fine plus liabilities
+
+3. Showing disrespect and gross misconduct to members or officials Temporary removal from
+during physical and online meetings
+
+WhatsApp group and a fine
+of 1000/=
+
+4. Non executions or poor handling of roles by officials
+
+Warning then replacement
+
+5. Non-attendance of 1 physical meetings
+
+1000/=
+
+6. Non-attendance of 2 consecutive physical meeting
+
+3000/=
+
+7. Non-attendance of 3 consecutive physical meetings (with/without
+
+5000/=
+
+apology)
+8. Non attendance of 4 consecutive physical meetings
+
+(Amended through the
+
+Eastern AGM
+Resolutions)-10,000/=
+
+|P a g e
+
+9. Non-payment of fines
+
+Temporary removal and
+20%fine
+
+17.0 SUPPORT OFFERED BY THE ASSOCIATION
+Welfare/social fund.
+
+
+
+The types of benefits forwhich the social fund shall be used for;
+i)
+
+Death of a member, each memberto contribute Ksh1000
+
+ii)
+
+Death of a spouse, each memberto contribute Ksh 500
+
+iii)
+
+Death of a child, each memberto contribute Ksh500
+
+iv)
+
+Death of parents, each memberto contribute Ksh500
+
+v)
+
+In case any or both parents are deceased as member shall nominate two
+representatives as parents/guardians and a next of kin in the nomination
+form. The secretary shall ensure proper records are kept. An ID Copy or
+number in relation to each parent/guardian shall be filed at the point of
+nomination and upon death, the member shall provide a Burial permit or
+Death Certificate.
+
+vi)
+
+In case of any social event of a member or the group, the Association is at
+liberty to appoint a select committee which shall decide the budget and
+present it to the members for approval. This shall not be termed as a
+mandatory obligation.
+
+vii)
+
+In case a principal member suffers a life-threatening sickness due to accident,
+serious illness, terrorist attack/active shooter incident or any other
+work-related injury that exhausts the member financially beyond his means
+or that provided by NHIF leading to an accrued bill in excess of Ksh 250,000
+over and above the NHIF provision, and in which case sufficient proof
+MUST be presented to the group, each membermust contribute Ksh 1,000.
+
+18.0 DISSOLUTION
+The group may be dissolved:
+a) Whenthe group is declared bankrupt;
+b) By the government or court order.
+c) Voluntary winding up by members. This must be supported by 2/3 majority vote by
+the registered members during an AGM.
+19.0 AMENDMENT TO THE CONSTITUTION.
+
+|P a g e
+
+19.1Any member of the group may propose an amendment to this constitution
+90days to the AGM.
+19.2The number of members who shall agree before the constitution is amended
+shall be 2/3 of the members of present
+19.3The constitution shall come into force once it has been signed by all the executive
+members.
+
+SIGNATORIES
+TITLE
+1. CHAIRMAN:
+2. SECRETRAY:
+3. TREASURER:
+4. OVERSEER:
+
+|P a g e
+
+NAME
+
+DATE
+
+SIGN
+
+</article>
+
+  </div><!-- end main-content -->
+</div><!-- end constitution-wrapper -->
+
+<script>
+// Sidebar search functionality
+document.getElementById('sidebarSearch').addEventListener('keyup', function(e) {
+  const searchTerm = e.target.value.toLowerCase();
+  const sidebarLinks = document.querySelectorAll('#sidebarList a[data-section]');
+  
+  sidebarLinks.forEach(link => {
+    const text = link.textContent.toLowerCase();
+    if (text.includes(searchTerm)) {
+      link.parentElement.style.display = 'block';
+    } else {
+      link.parentElement.style.display = 'none';
+    }
+  });
+});
+
+// Scroll to active section
+window.addEventListener('scroll', function() {
+  const sections = document.querySelectorAll('section[id^="sec-"], section[id="preamble"], section[id="signatories"]');
+  const sidebarLinks = document.querySelectorAll('#sidebarList a[data-section]');
+  
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - 150;
+    const sectionBottom = sectionTop + section.offsetHeight;
+    const scrollPos = window.scrollY;
+    
+    if (scrollPos >= sectionTop && scrollPos < sectionBottom) {
+      sidebarLinks.forEach(link => link.classList.remove('active'));
+      const activeLink = document.querySelector(`#sidebarList a[data-section="${section.id}"]`);
+      if (activeLink) activeLink.classList.add('active');
+    }
+  });
+});
+
+// Toggle all sections
+function toggleAllSections() {
+  const buttons = document.querySelectorAll('.section-toggle');
+  buttons.forEach(btn => {
+    if (btn.classList.contains('collapsed')) {
+      btn.classList.remove('collapsed');
+      btn.classList.add('expanded');
+      btn.nextElementSibling.classList.add('show');
+    } else {
+      btn.classList.add('collapsed');
+      btn.classList.remove('expanded');
+      btn.nextElementSibling.classList.remove('show');
+    }
+  });
+}
+
+// Collapsible sections click handler
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('section-toggle')) {
+    e.target.classList.toggle('collapsed');
+    e.target.classList.toggle('expanded');
+    e.target.nextElementSibling.classList.toggle('show');
+  }
+});
+
+// PDF Download functionality
+function downloadPDF() {
+  const element = document.querySelector('.constitution-content');
+  const opt = {
+    margin: 10,
+    filename: 'OFSG_Constitution.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+  };
+  
+  // For now, show a message - would need html2pdf library
+  alert('PDF download requires additional library. Use the Print button to save as PDF instead.');
+}
+
+// Initialize sections with numbering
+document.addEventListener('DOMContentLoaded', function() {
+  const sections = document.querySelectorAll('section[id^="sec-"]');
+  sections.forEach((section, index) => {
+    const heading = section.querySelector('h2');
+    if (heading && !heading.classList.contains('section-number')) {
+      heading.classList.add('section-number');
+    }
+  });
+});
+</script>
+{% endblock %}

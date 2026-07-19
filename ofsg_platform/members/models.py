@@ -12,9 +12,6 @@ class Member(AbstractUser):
     next_of_kin_phone = models.CharField(max_length=15, blank=True)
     guardian_1 = models.CharField(max_length=100, blank=True)
     guardian_2 = models.CharField(max_length=100, blank=True)
-    profile_picture = models.FileField(upload_to='members/profile_pictures/', blank=True, null=True)
-    passport_photo = models.FileField(upload_to='members/passport_photos/', blank=True, null=True)
-    id_document = models.FileField(upload_to='members/id_documents/', blank=True, null=True)
 
     def __str__(self):
         return self.username

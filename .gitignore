@@ -7,6 +7,14 @@ db.sqlite3
 .env
 /secure_media/
 /staticfiles/
+ofsg_platform/secure_media/
+ofsg_platform/staticfiles/
 node_modules/
 .DS_Store
 .coverage
+tmp_*.py
+ofsg_platform/tmp_*.py
+ofsg_platform/debug_*.py
+ofsg_platform/repro_*.py
+ofsg_platform/inspect_*.py
+ofsg_platform/debug_output.txt

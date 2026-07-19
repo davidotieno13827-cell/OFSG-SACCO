@@ -1,0 +1,16 @@
+{% extends "admin/base.html" %}
+{% load static i18n %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/admin_extra.css' %}">
+{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+    <a href="{% url 'admin:index' %}">{% translate 'Django administration' %}</a>
+</div>
+<div class="ofsg-home-bar">
+    <a href="/members/">&#8592; Back to OFSG Portal Homepage</a>
+    <span>Oscar Five Self Help Group</span>
+</div>
+{% endblock %}

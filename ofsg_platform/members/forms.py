@@ -42,23 +42,6 @@ class MemberRegistrationForm(forms.Form):
     guardian_2 = forms.CharField(required=False, widget=forms.TextInput(attrs=input_attrs))
     password = forms.CharField(widget=forms.PasswordInput(attrs=input_attrs), required=True)
     confirm_password = forms.CharField(widget=forms.PasswordInput(attrs=input_attrs), required=True)
-    profile_picture = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'class': 'w-full text-sm text-slate-600'}))
-    passport_photo = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'class': 'w-full text-sm text-slate-600'}))
-    id_document = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'class': 'w-full text-sm text-slate-600'}))
-
-    def _validate_uploaded_file(self, uploaded_file, allowed_content_types, field_label):
-        if not uploaded_file:
-            return uploaded_file
-
-        max_size = 5 * 1024 * 1024
-        if uploaded_file.size > max_size:
-            raise forms.ValidationError(f"{field_label} must be smaller than 5MB.")
-
-        if uploaded_file.content_type not in allowed_content_types:
-            raise forms.ValidationError(
-                f"{field_label} must be one of: {', '.join(allowed_content_types)}."
-            )
-        return uploaded_file
 
     def clean(self):
         cleaned_data = super().clean()
@@ -70,27 +53,6 @@ class MemberRegistrationForm(forms.Form):
         if email and Member.objects.filter(email__iexact=email).exists():
             self.add_error('email', 'A user with that email already exists.')
         return cleaned_data
-
-    def clean_profile_picture(self):
-        return self._validate_uploaded_file(
-            self.cleaned_data.get('profile_picture'),
-            ['image/jpeg', 'image/png'],
-            'Profile picture'
-        )
-
-    def clean_passport_photo(self):
-        return self._validate_uploaded_file(
-            self.cleaned_data.get('passport_photo'),
-            ['image/jpeg', 'image/png'],
-            'Passport photo'
-        )
-
-    def clean_id_document(self):
-        return self._validate_uploaded_file(
-            self.cleaned_data.get('id_document'),
-            ['application/pdf', 'image/jpeg', 'image/png'],
-            'ID document'
-        )
 
     def save(self, commit=True):
         user = Member.objects.create_user(
@@ -104,50 +66,12 @@ class MemberRegistrationForm(forms.Form):
             guardian_2=self.cleaned_data.get('guardian_2', ''),
         )
         user.is_active = False
-        for field_name in ('profile_picture', 'passport_photo', 'id_document'):
-            uploaded_file = self.cleaned_data.get(field_name)
-            if uploaded_file:
-                setattr(user, field_name, uploaded_file)
         if commit:
             user.save()
         return user
 
 
 class ProfileUpdateForm(forms.ModelForm):
-    def _validate_uploaded_file(self, uploaded_file, allowed_content_types, field_label):
-        if not uploaded_file:
-            return uploaded_file
-
-        max_size = 5 * 1024 * 1024
-        if uploaded_file.size > max_size:
-            raise forms.ValidationError(f"{field_label} must be smaller than 5MB.")
-
-        if uploaded_file.content_type not in allowed_content_types:
-            raise forms.ValidationError(
-                f"{field_label} must be one of: {', '.join(allowed_content_types)}."
-            )
-        return uploaded_file
-
-    def clean_profile_picture(self):
-        return self._validate_uploaded_file(
-            self.cleaned_data.get('profile_picture'),
-            ['image/jpeg', 'image/png'],
-            'Profile picture'
-        )
-
-    def clean_passport_photo(self):
-        return self._validate_uploaded_file(
-            self.cleaned_data.get('passport_photo'),
-            ['image/jpeg', 'image/png'],
-            'Passport photo'
-        )
-
-    def clean_id_document(self):
-        return self._validate_uploaded_file(
-            self.cleaned_data.get('id_document'),
-            ['application/pdf', 'image/jpeg', 'image/png'],
-            'ID document'
-        )
     class Meta:
         model = Member
         fields = [
@@ -155,16 +79,10 @@ class ProfileUpdateForm(forms.ModelForm):
             'next_of_kin_phone',
             'guardian_1',
             'guardian_2',
-            'profile_picture',
-            'passport_photo',
-            'id_document',
         ]
         widgets = {
             'next_of_kin_name': forms.TextInput(attrs={'class': 'w-full p-2 border rounded'}),
             'next_of_kin_phone': forms.TextInput(attrs={'class': 'w-full p-2 border rounded'}),
             'guardian_1': forms.TextInput(attrs={'class': 'w-full p-2 border rounded'}),
             'guardian_2': forms.TextInput(attrs={'class': 'w-full p-2 border rounded'}),
-            'profile_picture': forms.FileInput(attrs={'class': 'w-full text-sm text-slate-600'}),
-            'passport_photo': forms.FileInput(attrs={'class': 'w-full text-sm text-slate-600'}),
-            'id_document': forms.FileInput(attrs={'class': 'w-full text-sm text-slate-600'}),
         }

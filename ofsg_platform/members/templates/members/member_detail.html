@@ -10,39 +10,19 @@
 </div>
 
 <div class="grid lg:grid-cols-2 gap-6">
-    <div class="card p-6">
+        <div class="card p-6">
         <h2 class="text-xl font-semibold text-slate-900">Member Profile</h2>
-            <div class="grid gap-4 md:grid-cols-2 mt-4">
-                {% if member.profile_picture %}
-                    <div class="text-center">
-                        <p class="font-medium text-slate-700 mb-2">Profile Picture</p>
-                        <img src="{% url 'member_file' member.id 'profile_picture' %}" alt="{{ member.username }} profile picture" class="mx-auto rounded-xl w-40 h-40 object-cover" />
-                    </div>
-                {% endif %}
-                <div>
-                    <dl class="space-y-3 text-sm text-slate-600">
-                        <div class="flex justify-between"><dt class="font-medium text-slate-700">Status</dt><dd>{% if member.is_active_member %}<span class="text-accent-green font-semibold">Active</span>{% else %}<span class="text-accent-maroon font-semibold">Inactive</span>{% endif %}</dd></div>
-                        <div class="flex justify-between"><dt class="font-medium text-slate-700">Registration</dt><dd>{{ member.registration_date|date:"M d, Y" }}</dd></div>
-                        <div class="flex justify-between"><dt class="font-medium text-slate-700">Next of Kin</dt><dd>{{ member.next_of_kin_name|default:"—" }}</dd></div>
-                        <div class="flex justify-between"><dt class="font-medium text-slate-700">Guardian 1</dt><dd>{{ member.guardian_1|default:"—" }}</dd></div>
-                        <div class="flex justify-between"><dt class="font-medium text-slate-700">Guardian 2</dt><dd>{{ member.guardian_2|default:"—" }}</dd></div>
-                    </dl>
-                </div>
+            <div class="mt-4">
+                <dl class="space-y-3 text-sm text-slate-600">
+                    <div class="flex justify-between"><dt class="font-medium text-slate-700">Status</dt><dd>{% if member.is_active_member %}<span class="text-accent-green font-semibold">Active</span>{% else %}<span class="text-accent-maroon font-semibold">Inactive</span>{% endif %}</dd></div>
+                    <div class="flex justify-between"><dt class="font-medium text-slate-700">Registration</dt><dd>{{ member.registration_date|date:"M d, Y" }}</dd></div>
+                    <div class="flex justify-between"><dt class="font-medium text-slate-700">Phone</dt><dd>{{ member.phone_number|default:"—" }}</dd></div>
+                    <div class="flex justify-between"><dt class="font-medium text-slate-700">Next of Kin</dt><dd>{{ member.next_of_kin_name|default:"—" }}</dd></div>
+                    <div class="flex justify-between"><dt class="font-medium text-slate-700">Guardian 1</dt><dd>{{ member.guardian_1|default:"—" }}</dd></div>
+                    <div class="flex justify-between"><dt class="font-medium text-slate-700">Guardian 2</dt><dd>{{ member.guardian_2|default:"—" }}</dd></div>
+                </dl>
             </div>
-            <div class="mt-6 space-y-3 text-sm text-slate-600">
-                {% if member.passport_photo %}
-                    <div>
-                        <p class="font-medium text-slate-700">Passport Photo</p>
-                        <a href="{% url 'member_file' member.id 'passport_photo' %}" class="text-accent-navy hover:underline">Download or view passport photo</a>
-                    </div>
-                {% endif %}
-                {% if member.id_document %}
-                    <div>
-                        <p class="font-medium text-slate-700">ID Document</p>
-                        <a href="{% url 'member_file' member.id 'id_document' %}" class="text-accent-navy hover:underline">Download ID document</a>
-                    </div>
-                {% endif %}
-            </div>
+    </div>
     <div class="card p-6">
         <h2 class="text-xl font-semibold text-slate-900">Recent Contributions</h2>
         <ul class="mt-4 space-y-3">

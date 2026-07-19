@@ -6,7 +6,7 @@
     <h2 class="text-2xl font-bold mb-2 text-accent-navy">Update Nomination Details</h2>
     <p class="text-sm text-slate-600 mb-6">Keep your next-of-kin and guardian details accurate and up to date for SACCO records.</p>
 
-    <form method="post" enctype="multipart/form-data" class="space-y-4">
+    <form method="post" class="space-y-4">
         {% csrf_token %}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -24,30 +24,6 @@
             <div>
                 <label class="block font-semibold text-slate-700 mb-2">Guardian 2</label>
                 {{ form.guardian_2 }}
-            </div>
-            <div>
-                <label class="block font-semibold text-slate-700 mb-2">Profile Picture</label>
-                {{ form.profile_picture }}
-                {% if user.profile_picture %}
-                    <p class="text-xs text-slate-500 mt-1">Current file: {{ user.profile_picture.name|basename }}</p>
-                    <a href="{% url 'member_file' user.pk 'profile_picture' %}" target="_blank" class="text-sm text-accent-navy hover:underline">Open profile picture</a>
-                {% endif %}
-            </div>
-            <div>
-                <label class="block font-semibold text-slate-700 mb-2">Passport Photo</label>
-                {{ form.passport_photo }}
-                {% if user.passport_photo %}
-                    <p class="text-xs text-slate-500 mt-1">Current file: {{ user.passport_photo.name|basename }}</p>
-                    <a href="{% url 'member_file' user.pk 'passport_photo' %}" target="_blank" class="text-sm text-accent-navy hover:underline">Open passport photo</a>
-                {% endif %}
-            </div>
-            <div class="md:col-span-2">
-                <label class="block font-semibold text-slate-700 mb-2">ID Document</label>
-                {{ form.id_document }}
-                {% if user.id_document %}
-                    <p class="text-xs text-slate-500 mt-1">Current file: {{ user.id_document.name|basename }}</p>
-                    <a href="{% url 'member_file' user.pk 'id_document' %}" target="_blank" class="text-sm text-accent-navy hover:underline">Open ID document</a>
-                {% endif %}
             </div>
         </div>
         <button type="submit" class="w-full brand-btn font-bold py-3 rounded-lg transition">
